@@ -1,4 +1,5 @@
 from enum import Enum
+from errors import ParserError
 
 
 class Colors(Enum):
@@ -26,27 +27,28 @@ class Parser():
     def parsing(map_file: str):
         result = {'connection': [],
                   'hub': []}
-        with open(map_file) as map:
-            for line in map.readlines():
-                line = line.replace('\n', '').replace(':', '')
-                if not line.startswith('#') and line:
-                    args = line.split(maxsplit=4)
-                    if 'nb_drones' in args:
-                        result[args[0]] = args[1]
-                    elif 'connection' in args:
-                        result[args[0]].append(args[1])
-                    elif 'hub' in args:
-                        result[args[0]].append([args[1],
-                                                int(args[2]),
-                                                int(args[3]),
-                                                args[4]])
-                    else:
-                        new = {args[0]: [args[1], int(args[2]),
-                                         int(args[3]), args[4]]}
-                        result.update(new)
+        try:
+            with open(map_file) as map:
+                for line in map.readlines():
+                    line = line.replace('\n', '').replace(':', '')
+                    if not line.startswith('#') and line:
+                        args = line.split(maxsplit=4)
+                        if 'nb_drones' in args:
+                            result[args[0]] = args[1]
+                        elif 'connection' in args:
+                            result[args[0]].append(tuple(args[1].split('-')))
+                        elif 'hub' in args:
+                            result[args[0]].append([int(arg) if arg.isdigit()
+                                                   else arg
+                                                   for arg in args[1:]])
+                        else:
+                            new = {args[0]: [int(arg) if arg.isdigit() else arg
+                                             for arg in args[1:]]}
+                            result.update(new)
 
-        return result
+            return result
+        except FileNotFoundError as e:
+            print(e)
+        except Exception:
+            raise ParserError('Error: invalid map format')
 
-
-result = Parser.parsing('maps/challenger/01_the_impossible_dream.txt')
-print(result)
