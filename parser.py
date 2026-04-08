@@ -161,11 +161,16 @@ missing informations')
         metadata = hub.get('metadata')
         if not metadata:
             return
+        if any(_ not in metadata for _ in '[=]'):
+            raise ParserError("invalid syntax use [<metadata_type>=<value>] \
+for metadata")
         split_metadata = metadata.replace('[', '').replace(']', '').split()
         meta = {}
         try:
             for m in split_metadata:
                 split_m = m.split('=')
+                if not split_m[1]:
+                    raise IndexError()
                 if split_m[0] in ('color', 'max_drones', 'zone'):
                     if (split_m[1] in Zone or split_m[1] in Colors
                             or (split_m[0] == 'max_drones'
@@ -175,7 +180,7 @@ missing informations')
                                             else split_m[1])
                     else:
                         if split_m[0] == 'zone' and split_m[1] not in Zone:
-                            raise ParserError(f"Invalid zone: '{split_m[1]}'.\
+                            raise ParserError("Invalid zone.\
  Valid zones are: normal, blocked, restricted, priority")
                         if split_m[0] == 'color' and split_m[1] not in Colors:
                             raise ParserError(f"Invalid color: '{split_m[1]}'.\
@@ -185,8 +190,8 @@ darkred, violet, crimson, rainbow, blue, yellow, cyan, lime, magenta")
                             raise ParserError('Invalid max_drones: value \
 must be greater than 0')
         except IndexError:
-            raise ParserError(f"Invalid format: '{m}'. \
-Expected [name]=[value]")
+            raise ParserError("Invalid format. \
+Expected [<metadata_type>=<value>]")
         except ValueError:
             raise ParserError("max_drones must be a valid integer")
         return {'metadata': meta}
@@ -221,6 +226,9 @@ duplicate conection')
                 if zones[0] == zones[1]:
                     raise ParserError(f'Line {self.find_line(line)}: Invalid \
 zones both zones must be different')
+                if len(zones) != 2:
+                    raise ParserError(f'Line {self.find_line(line)}: invalid \
+connection format. Expectd: connection: <zona1>-<zona2> [metadata]')
                 crtl_list.append(tuple(zones))
                 connection['zone1'] = zones[0]
                 connection['zone2'] = zones[1]
@@ -239,7 +247,7 @@ max_link_capacity must be a valid integer')
 
     def check_connection_metadata(self, metadata: str) -> dict[str, Any]:
         if '[' not in metadata or ']' not in metadata or '=' not in metadata:
-            raise ParserError('invalid syntax use [<metadata_name>=<value>] \
+            raise ParserError('invalid syntax use [<metadata_type>=<value>] \
 for metadata')
         metadata = metadata.strip('[]').split('=')
         if metadata[0] != 'max_link_capacity':
