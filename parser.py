@@ -209,7 +209,7 @@ Expected [<metadata_type>=<value>]")
         self.names.append(split_line[0])
         return split_line[0]
 
-    def check_conections(self, lines: list[str]) -> Any:
+    def check_conections(self, lines: list[str]) -> dict[str, list]:
         connections = {'connections': []}
         crtl_list = []
         for line in lines:

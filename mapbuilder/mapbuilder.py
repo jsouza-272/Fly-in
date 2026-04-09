@@ -3,7 +3,7 @@ from .hub import Hub
 
 
 class MapBuilder():
-    def __init__(self, connection: list[tuple], hub: list[list],
+    def __init__(self, connection: list[dict], hub: list[list],
                  nb_drones: int, start_hub: list, end_hub: list):
         self.connections = connection
         self.nb_drones = nb_drones
