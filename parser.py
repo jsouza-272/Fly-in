@@ -1,19 +1,13 @@
 from colors import Colors
 from zones import Zone
-from sys import exit
 from errors import ParserError
 from typing import Any
-# check para se tiver muitas coordenadas
 
 
 class Parser():
     def __init__(self, map_path: str):
-        try:
-            with open(map_path) as lines:
-                self.lines = lines.read().splitlines()
-        except FileNotFoundError as e:
-            print(e)
-            exit(1)
+        with open(map_path) as lines:
+            self.lines = lines.read().splitlines()
         self.names = []
 
     def parsing(self):
@@ -25,7 +19,7 @@ class Parser():
         config.update(self.check_hub(copy_lines))
         config.update(self.check_end_hub(copy_lines))
         config.update(self.check_conections(copy_lines))
-        print(config)
+        return config
 
     def check_lines(self, lines: list[str]) -> None:
         valid = ('#', 'nb_drones', 'start_hub', 'hub', 'end_hub',
@@ -36,7 +30,7 @@ class Parser():
 
     def check_first_line(self, lines: list[str]) -> dict[str, int]:
         for line in lines:
-            if not line.startswith('#'):
+            if line and not line.startswith('#'):
                 break
         if 'nb_drones' not in line:
             raise ParserError(f'Line {self.find_line(line)}: first line must \
