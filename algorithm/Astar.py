@@ -13,10 +13,11 @@ class Astar():
         gx, gy = goal
         return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
 
-    def algorithm(self, graph: MapBuilder) -> None:
+    def algorithm(self, graph: MapBuilder,
+                  rejected: list[Hub] = []) -> list[Hub]:
         map = graph.map
         open_set = {map[0]}
-        close_set = set()
+        close_set = set(rejec for rejec in rejected)
         gscore = {map[0]: 0}
         fscore = {map[0]: 0 + self.euclidean(map[0].xy,
                                              map[1].xy)}
@@ -45,7 +46,7 @@ class Astar():
                 break
         return self.make_path(camefrom, map[1], map[0])
 
-    def make_path(self, camefrom: dict, goal: Hub, start: Hub):
+    def make_path(self, camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
         path = [goal]
         current = goal
         while True:
@@ -54,4 +55,3 @@ class Astar():
             if current == start:
                 break
         return path
-        

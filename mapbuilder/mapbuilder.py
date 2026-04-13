@@ -1,12 +1,15 @@
 from .hub import Hub
+from drones import Drones
 
 
 class MapBuilder():
     def __init__(self, connections: list[dict], hub: list[dict],
                  nb_drones: int, start_hub: dict, end_hub: dict):
         self.connections = connections
-        self.nb_drones = nb_drones
         self.map = self.build_map(hub, start_hub, end_hub)
+        self.drones = [Drones(f'D{i + 1}', self.map[0])
+                       for i in range(nb_drones)]
+        self.map[0].drones.extend(self.drones)
 
     def build_map(self, hub: list[dict], start_hub: dict, end_hub: dict):
         hubs = [start_hub, end_hub]

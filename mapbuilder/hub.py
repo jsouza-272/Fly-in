@@ -11,6 +11,7 @@ class Hub():
         self.zone = Zone.NORMAL
         self.max_drones = 1
         self.neighbors = []
+        self.drones = []
         if metadata:
             self.set_metadata(metadata)
         self.set_cost()
@@ -49,3 +50,6 @@ class Hub():
 
     def __repr__(self):
         return self.name
+
+    def free(self) -> bool:
+        return len(self.drones) < self.max_drones
