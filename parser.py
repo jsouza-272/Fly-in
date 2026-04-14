@@ -9,16 +9,16 @@ class Parser():
         with open(map_path) as lines:
             self.lines = lines.read().splitlines()
         self.names = []
+        self.coordinates = []
 
     def parsing(self):
         config = {}
-        copy_lines = self.lines.copy()
-        self.check_lines(copy_lines)
-        config.update(self.check_first_line(copy_lines))
-        config.update(self.check_start_hub(copy_lines))
-        config.update(self.check_hub(copy_lines))
-        config.update(self.check_end_hub(copy_lines))
-        config.update(self.check_conections(copy_lines))
+        self.check_lines(self.lines)
+        config.update(self.check_first_line(self.lines))
+        config.update(self.check_start_hub(self.lines))
+        config.update(self.check_hub(self.lines))
+        config.update(self.check_end_hub(self.lines))
+        config.update(self.check_conections(self.lines))
         return config
 
     def check_lines(self, lines: list[str]) -> None:
@@ -67,6 +67,8 @@ start_hub need name')
                                                                 split()[2])})
                         start_hub['start_hub'].update({'y': int(line.
                                                                 split()[3])})
+                        self.check_coordinates(start_hub['start_hub']['x'],
+                                               start_hub['start_hub']['x'])
                         try:
                             start_hub['start_hub'].update(
                                 self.check_hub_metadata(
@@ -78,9 +80,11 @@ start_hub need name')
         except ValueError:
             raise ParserError(f'Line {self.find_line(line)}: \
 invalid coordnates')
-        except IndexError:
+        except (IndexError, KeyError):
             raise ParserError(f'Line {self.find_line(line)}: \
 missing informations')
+        except ParserError as e:
+            raise ParserError(f'Line {self.find_line(line)}: {e}')
         return start_hub
 
     def check_end_hub(self, lines: list[str]) -> dict[str, Any]:
@@ -103,6 +107,8 @@ end_hub need name')
                             line.split()[2])})
                         end_hub['end_hub'].update({'y': int(
                             line.split()[3])})
+                        self.check_coordinates(end_hub['end_hub']['x'],
+                                               end_hub['end_hub']['y'])
                         try:
                             end_hub['end_hub'].update(self.check_hub_metadata(
                                 {'metadata': line.split(maxsplit=4)[4]}))
@@ -116,6 +122,8 @@ invalid coordnates')
         except IndexError:
             raise ParserError(f'Line {self.find_line(line)}: \
 missing informations')
+        except ParserError as e:
+            raise ParserError(f'Line {self.find_line(line)}: {e}')
         return end_hub
 
     def check_hub(self, lines: list[str]) -> dict[str, Any]:
@@ -133,6 +141,7 @@ hub need name')
                                 self.check_hub_name(line)})
                     hub.update({'x': int(line.split()[2])})
                     hub.update({'y': int(line.split()[3])})
+                    self.check_coordinates(hub['x'], hub['y'])
                     try:
                         hub.update(self.check_hub_metadata(
                             {'metadata': line.split(maxsplit=4)[4]}))
@@ -149,6 +158,8 @@ invalid coordnates')
         except IndexError:
             raise ParserError(f'Line {self.find_line(line)}: \
 missing informations')
+        except ParserError as e:
+            raise ParserError(f'Line {self.find_line(line)}: {e}')
         return hubs
 
     def check_hub_metadata(self, hub: dict[str, Any]) -> dict[str, Any]:
@@ -166,17 +177,20 @@ for metadata")
                 if not split_m[1]:
                     raise IndexError()
                 if split_m[0] in ('color', 'max_drones', 'zone'):
-                    if (split_m[1] in Zone or split_m[1] in Colors
+                    if (split_m[1] in Zone._value2member_map_ or split_m[1]
+                        in Colors._value2member_map_
                             or (split_m[0] == 'max_drones'
                                 and int(split_m[1]) > 0)):
                         meta[split_m[0]] = (int(split_m[1])
                                             if split_m[0] == 'max_drones'
                                             else split_m[1])
                     else:
-                        if split_m[0] == 'zone' and split_m[1] not in Zone:
+                        if (split_m[0] == 'zone' and split_m[1] not in
+                                Zone._value2member_map_):
                             raise ParserError("Invalid zone.\
  Valid zones are: normal, blocked, restricted, priority")
-                        if split_m[0] == 'color' and split_m[1] not in Colors:
+                        if (split_m[0] == 'color' and split_m[1] not in
+                                Colors._value2member_map_):
                             raise ParserError(f"Invalid color: '{split_m[1]}'.\
 Valid colors are: green, red, purple, brown, orange, maroon, gold, black, \
 darkred, violet, crimson, rainbow, blue, yellow, cyan, lime, magenta")
@@ -250,6 +264,11 @@ for metadata')
             raise ParserError('max_link_capacity value \
 must be greater than 0')
         return {metadata[0]: metadata[1]}
+
+    def check_coordinates(self, x: int, y: int) -> None:
+        if (x, y) in self.coordinates:
+            raise ParserError("Coordinates already exist")
+        self.coordinates.append((x, y))
 
     def find_line(self, line: str) -> int:
         return self.lines.index(line) + 1

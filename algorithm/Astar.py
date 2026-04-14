@@ -4,9 +4,6 @@ import math
 
 
 class Astar():
-    def __init__(self):
-        pass
-
     def euclidean(self, current: tuple[int, int],
                   goal: tuple[int, int]) -> int:
         cx, cy = current
