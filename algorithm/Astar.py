@@ -1,5 +1,5 @@
-from mapbuilder.hub import Hub
-from mapbuilder import MapBuilder
+from map.hub import Hub
+from map.map import Map
 import math
 
 
@@ -10,7 +10,7 @@ class Astar():
         gx, gy = goal
         return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
 
-    def algorithm(self, graph: MapBuilder,
+    def algorithm(self, graph: Map,
                   rejected: list[Hub] = []) -> list[Hub]:
         map = graph.map
         open_set = {map[0]}
@@ -22,8 +22,9 @@ class Astar():
 
         while open_set:
             currend_node = min(fscore, key=lambda k: fscore[k])
-            neighbors = [n for n in currend_node.neighbors
-                         if n not in close_set]
+            neighbors = [n.get_other_hub(currend_node)
+                         for n in currend_node.links
+                         if n.get_other_hub(currend_node) not in close_set]
             for n in neighbors:
                 if n not in open_set:
                     open_set.add(n)

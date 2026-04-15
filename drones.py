@@ -1,4 +1,4 @@
-from mapbuilder.hub import Hub
+from map.hub import Hub
 
 
 class Drones():
@@ -6,13 +6,21 @@ class Drones():
         self.name = name
         self.node = node
         self.came_from = [node]
+        self.destination = None
 
     def __repr__(self):
         return self.name
 
+    def set_destination(self, path: list[Hub]) -> None:
+        self.destination = path
+
+    def step(self) -> None:
+        if isinstance(self.destination, list) and self.destination:
+            step = self.destination.pop()
+            if step.free():
+                self.move(step)
+
     def move(self, to: Hub) -> str:
-        if not to.free() or self.node == to or to in self.came_from:
-            return ''
         self.came_from.append(to)
         self.node.drones.remove(self)
         to.drones.append(self)

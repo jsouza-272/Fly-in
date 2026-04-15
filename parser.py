@@ -126,13 +126,11 @@ missing informations')
             raise ParserError(f'Line {self.find_line(line)}: {e}')
         return end_hub
 
-    def check_hub(self, lines: list[str]) -> dict[str, Any]:
-        ctrl = False
+    def check_hub(self, lines: list[str]) -> dict:
         hubs = {'hub': []}
         try:
             for line in lines:
                 if line.startswith('hub:'):
-                    ctrl = True
                     hub = {}
                     if line.split()[1].isdigit():
                         raise ParserError(f'Line {self.find_line(line)}: \
@@ -150,8 +148,6 @@ hub need name')
                     except ParserError as e:
                         raise ParserError(f'Line {self.find_line(line)}: {e}')
                     hubs['hub'].append(hub)
-            if not ctrl:
-                raise ParserError('hub not found')
         except ValueError:
             raise ParserError(f'Line {self.find_line(line)}: \
 invalid coordnates')
@@ -160,7 +156,9 @@ invalid coordnates')
 missing informations')
         except ParserError as e:
             raise ParserError(f'Line {self.find_line(line)}: {e}')
-        return hubs
+        if hubs['hub']:
+            return hubs
+        return {}
 
     def check_hub_metadata(self, hub: dict[str, Any]) -> dict[str, Any]:
         metadata = hub.get('metadata')
@@ -226,7 +224,7 @@ Expected [<metadata_type>=<value>]")
                 zones = line.split()[1].split('-')
                 if zones[0] not in self.names or zones[1] not in self.names:
                     raise ParserError(f'Line {self.find_line(line)}: \
-invalid zone name {zones} {self.names}')
+invalid zone name \"{zones[0] if zones[0] not in self.names else zones[1]}\"')
                 if (tuple(zones) in crtl_list
                         or tuple(reversed(zones)) in crtl_list):
                     raise ParserError(f'Line {self.find_line(line)}: \
@@ -251,6 +249,8 @@ max_link_capacity must be a valid integer')
                 except IndexError:
                     pass
                 connections['connections'].append(connection)
+        if not connections['connections']:
+            raise ParserError('ERROR: connections required')
         return connections
 
     def check_connection_metadata(self, metadata: str) -> dict[str, Any]:

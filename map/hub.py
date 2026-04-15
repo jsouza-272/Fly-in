@@ -10,33 +10,32 @@ class Hub():
         self.color = None
         self.zone = Zone.NORMAL
         self.max_drones = 1
-        self.neighbors = []
         self.drones = []
+        self.links = []
         if metadata:
             self.set_metadata(metadata)
         self.set_cost()
 
-    def add_neighbor(self, neighbor: 'Hub') -> None:
-        if neighbor not in self.neighbors and self not in neighbor.neighbors:
-            self.neighbors.append(neighbor)
-            neighbor.neighbors.append(self)
+    def __repr__(self):
+        return self.name
 
     def set_metadata(self, metadata: dict) -> None:
         for key, value in metadata.items():
             if key == 'color':
                 for c in Colors:
                     if c.value == value:
-                        self.color == c
-                    else:
-                        pass
+                        self.color = c
+                        break
             elif key == 'zone':
                 for z in Zone:
                     if z.value == value:
-                        self.zone == z
-                    else:
-                        pass
+                        self.zone = z
+                        break
             else:
                 self.max_drones = value
+
+    def set_link_capacity(self, max_link_capacity: int = 1) -> None:
+        self.max_link_capacity = max_link_capacity
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
@@ -47,9 +46,6 @@ class Hub():
             self.cost = 2
         else:
             self.cost = 1
-
-    def __repr__(self):
-        return self.name
 
     def free(self) -> bool:
         return len(self.drones) < self.max_drones
