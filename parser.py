@@ -27,6 +27,8 @@ class Parser():
         for line in lines:
             if line and not line.startswith(valid):
                 raise ParserError(f'Line {self.find_line(line)}: invalid line')
+            if line and not line.startswith('#') and '#' in line:
+                line = line.split('#')[0]
 
     def check_first_line(self, lines: list[str]) -> dict[str, int]:
         for line in lines:

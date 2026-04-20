@@ -7,9 +7,9 @@ import sys
 ccc = 'maps/challenger/01_the_impossible_dream.txt'
 first = 'maps/easy/01_linear_path.txt'
 hard = 'maps/hard/02_capacity_hell.txt'
-hard2 = 'maps/hard//03_ultimate_challenge.txt'
+hard2 = 'maps/hard/03_ultimate_challenge.txt'
 try:
-    parsing = Parser(first)
+    parsing = Parser(hard2)
     config = parsing.parsing()
 except Exception as e:
     print(e)

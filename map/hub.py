@@ -14,6 +14,7 @@ class Hub():
         self.links = []
         if metadata:
             self.set_metadata(metadata)
+        self.blocked = True if self.zone == Zone.BLOCKED else False
         self.set_cost()
 
     def __repr__(self):
@@ -39,11 +40,11 @@ class Hub():
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
-            self.cost = 99
+            self.cost = 999
         elif self.zone == Zone.PRIORITY:
             self.cost = -1
         elif self.zone == Zone.RESTRICTED:
-            self.cost = 2
+            self.cost = 10
         else:
             self.cost = 1
 

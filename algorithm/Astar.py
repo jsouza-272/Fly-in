@@ -22,11 +22,11 @@ class Astar():
 
         while open_set:
             currend_node = min(fscore, key=lambda k: fscore[k])
-            neighbors = [n.get_other_hub(currend_node)
+            neighbors = [n.get_next_hub(currend_node)
                          for n in currend_node.links
-                         if n.get_other_hub(currend_node) not in close_set]
+                         if n.get_next_hub(currend_node) not in close_set]
             for n in neighbors:
-                if n not in open_set:
+                if n not in open_set and not n.blocked:
                     open_set.add(n)
                     gscore[n] = gscore[currend_node] + n.cost
                     fscore[n] = gscore[n] + self.euclidean(n.xy, map[1].xy)

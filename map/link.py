@@ -16,8 +16,6 @@ class Link():
         for key, value in metadata.items():
             if key == 'max_link_capacity':
                 self.max_link_capacity = value
-            else:
-                print(key, value)
 
     def can_use(self) -> bool:
         return self.usage < self.max_link_capacity
@@ -32,7 +30,7 @@ class Link():
             return self.zone2
         return
 
-    def get_other_hub(self, current: Hub) -> Hub | None:
+    def get_next_hub(self, current: Hub) -> Hub | None:
         if self.zone1 == current:
             return self.zone2
         if self.zone2 == current:
