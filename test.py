@@ -9,7 +9,7 @@ first = 'maps/easy/01_linear_path.txt'
 hard = 'maps/hard/02_capacity_hell.txt'
 hard2 = 'maps/hard/03_ultimate_challenge.txt'
 try:
-    parsing = Parser(hard)
+    parsing = Parser(ccc)
     config = parsing.parsing()
 except Exception as e:
     print(e)

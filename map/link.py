@@ -12,6 +12,9 @@ class Link():
         if metadata:
             self.set_metadata(metadata)
 
+    def __repr__(self):
+        return f"{self.zone1}<->{self.zone2}"
+
     def set_metadata(self, metadata: dict[str, Any]) -> None:
         for key, value in metadata.items():
             if key == 'max_link_capacity':
