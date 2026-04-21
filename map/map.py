@@ -1,6 +1,7 @@
 from .hub import Hub
 from drones import Drones
 from .link import Link
+from errors import AstarError
 
 
 class Map():
@@ -32,7 +33,53 @@ class Map():
 
     def set_drone_destination(self, path: list[Hub]) -> None:
         for d in self.drones:
-            d.set_destination(path)
+            d.set_destination(path.copy())
+
+    def reset_links(self) -> None:
+        for hub in self.map:
+            hub.reset_links()
 
     def turn(self) -> None:
-        pass
+        from algorithm.Astar import Astar
+        turn = 0
+        while self.drones:
+            move_message = ''
+            for d in self.drones:
+                step = d.destination[-1]
+                if d.node == step:
+                    d.destination.pop()
+                    step = d.destination[-1]
+                if step.free():
+                    move_message += d.move(step)
+                    d.destination.pop()
+                elif not step.free() and len(d.node.links) > 1:
+                    try:
+                        print('old', d.destination)
+                        new_path = Astar().algorithm(self, [step])
+                        print('new', new_path)
+                        if d.node in new_path:
+                            d.destination = new_path[new_path.index(d.node):]
+                            print('new', d.destination)
+                            step = d.destination[-1]
+                            if d.node == step:
+                                d.destination.pop()
+                                step = d.destination[-1]
+                                move_message += d.move(step)
+                                d.destination.pop()
+                            else:
+                                move_message += d.move(step)
+                                d.destination.pop()
+                    except AstarError:
+                        print('\n\nfail\n')
+                else:
+                    d.wait()
+                    move_message += f"{d} waiting "
+                if not d.destination:
+                    self.drones.remove(d)
+                if d.name == 'D2':
+                    print(d, d.node)
+            print(move_message, "\n")
+            turn += 1
+            self.reset_links()
+        print()
+        print(turn, 'turns')

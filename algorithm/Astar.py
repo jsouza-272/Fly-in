@@ -1,5 +1,6 @@
 from map.hub import Hub
 from map.map import Map
+from errors import AstarError
 import math
 
 
@@ -14,7 +15,7 @@ class Astar():
                   rejected: list[Hub] = []) -> list[Hub]:
         map = graph.map
         open_set = {map[0]}
-        close_set = set(rejec for rejec in rejected)
+        close_set = set(rejected)
         gscore = {map[0]: 0}
         fscore = {map[0]: 0 + self.euclidean(map[0].xy,
                                              map[1].xy)}
@@ -41,8 +42,8 @@ class Astar():
             close_set.add(currend_node)
             fscore.pop(currend_node)
             if currend_node == map[1]:
-                break
-        return self.make_path(camefrom, map[1], map[0])
+                return self.make_path(camefrom, map[1], map[0])
+        raise AstarError("Error: path not exist")
 
     def make_path(self, camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
         path = [goal]

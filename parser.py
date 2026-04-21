@@ -28,7 +28,7 @@ class Parser():
             if line and not line.startswith(valid):
                 raise ParserError(f'Line {self.find_line(line)}: invalid line')
             if line and not line.startswith('#') and '#' in line:
-                line = line.split('#')[0]
+                lines[lines.index(line)] = line.split('#')[0]
 
     def check_first_line(self, lines: list[str]) -> dict[str, int]:
         for line in lines:
@@ -147,8 +147,6 @@ hub need name')
                             {'metadata': line.split(maxsplit=4)[4]}))
                     except IndexError:
                         pass
-                    except ParserError as e:
-                        raise ParserError(f'Line {self.find_line(line)}: {e}')
                     hubs['hub'].append(hub)
         except ValueError:
             raise ParserError(f'Line {self.find_line(line)}: \
@@ -169,6 +167,10 @@ missing informations')
         if any(_ not in metadata for _ in '[=]'):
             raise ParserError("invalid syntax use [<metadata_type>=<value>] \
 for metadata")
+        dup = {metadata.count(_) > 1: _[:-1]
+               for _ in ('color=', 'zone=', 'max_drones=')}
+        if any(dup):
+            raise ParserError(f'Duplicate metadata field "{dup[True]}"')
         split_metadata = metadata.replace('[', '').replace(']', '').split()
         meta = {}
         try:
@@ -197,6 +199,8 @@ darkred, violet, crimson, rainbow, blue, yellow, cyan, lime, magenta")
                         if split_m[0] == 'max_drones' and int(split_m[1]) < 1:
                             raise ParserError('Invalid max_drones: value \
 must be greater than 0')
+                else:
+                    raise ParserError(f'Invalid metadata "{split_m[0]}"')
         except IndexError:
             raise ParserError("Invalid format. \
 Expected [<metadata_type>=<value>]")
@@ -256,16 +260,19 @@ max_link_capacity must be a valid integer')
         return connections
 
     def check_connection_metadata(self, metadata: str) -> dict[str, Any]:
-        if '[' not in metadata or ']' not in metadata or '=' not in metadata:
+        if any(_ not in metadata for _ in '[=]'):
             raise ParserError('invalid syntax use [<metadata_type>=<value>] \
 for metadata')
+        dup = {metadata.count('max_link_capacity=') > 1: 'max_link_capacity'}
+        if True in dup:
+            raise ParserError(f'Duplicate metadata field "{dup[True]}"')
         metadata = metadata.strip('[]').split('=')
         if metadata[0] != 'max_link_capacity':
             raise ParserError('invalid metadata')
         if int(metadata[1]) < 1:
             raise ParserError('max_link_capacity value \
 must be greater than 0')
-        return {metadata[0]: metadata[1]}
+        return {metadata[0]: int(metadata[1])}
 
     def check_coordinates(self, x: int, y: int) -> None:
         if (x, y) in self.coordinates:

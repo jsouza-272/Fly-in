@@ -21,8 +21,15 @@ class Drones():
                 self.move(step)
 
     def move(self, to: Hub) -> str:
-        self.came_from.append(to)
-        self.node.drones.remove(self)
-        to.drones.append(self)
-        self.node = to
-        return f'{self.name}-{to} '
+        link = self.node.get_link(to)
+        if link and link.can_use():
+            link.use()
+            self.came_from.append(to)
+            self.node.drones.remove(self)
+            to.drones.append(self)
+            self.node = to
+            return f'{self.name}-{to} '
+        return ''
+
+    def wait(self) -> None:
+        return

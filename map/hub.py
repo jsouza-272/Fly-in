@@ -48,5 +48,21 @@ class Hub():
         else:
             self.cost = 1
 
+    def get_link(self, next: 'Hub'):
+        for link in self.links:
+            if link.get_next_hub(self) == next:
+                return link
+
+    def get_other_link(self, next: 'Hub'):
+        if len(self.links) < 2:
+            return
+        for link in self.links:
+            if link.get_next_hub(self) != next:
+                return link
+
     def free(self) -> bool:
         return len(self.drones) < self.max_drones
+
+    def reset_links(self) -> None:
+        for link in self.links:
+            link.reset_usage()

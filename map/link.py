@@ -35,6 +35,7 @@ class Link():
             return self.zone2
         if self.zone2 == current:
             return self.zone1
+        return
 
     def reset_usage(self) -> None:
         self.usage = 0

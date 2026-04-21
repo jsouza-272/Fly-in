@@ -9,7 +9,7 @@ first = 'maps/easy/01_linear_path.txt'
 hard = 'maps/hard/02_capacity_hell.txt'
 hard2 = 'maps/hard/03_ultimate_challenge.txt'
 try:
-    parsing = Parser(hard2)
+    parsing = Parser(hard)
     config = parsing.parsing()
 except Exception as e:
     print(e)
@@ -17,4 +17,5 @@ except Exception as e:
 map = Map(**config)
 map.set_drone_destination(Astar().algorithm(map))
 drones = map.drones
-print(Astar().algorithm(map))
+map.turn()
+# print(Astar().algorithm(map))
