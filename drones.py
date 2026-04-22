@@ -23,6 +23,7 @@ class Drones():
     def move(self, to: Hub) -> str:
         link = self.node.get_link(to)
         if link and link.can_use():
+            self.destination.pop()
             link.use()
             self.came_from.append(to)
             self.node.drones.remove(self)

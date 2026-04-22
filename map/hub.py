@@ -4,7 +4,8 @@ from colors import Colors
 
 class Hub():
     def __init__(self, name: str, x: int,
-                 y: int, metadata: dict | None = None):
+                 y: int, metadata: dict | None = None,
+                 nb_drones: int | None = None):
         self.name = name
         self.xy = (x, y)
         self.color = None
@@ -13,14 +14,17 @@ class Hub():
         self.drones = []
         self.links = []
         if metadata:
-            self.set_metadata(metadata)
+            self.set_metadata(metadata, nb_drones)
         self.blocked = True if self.zone == Zone.BLOCKED else False
         self.set_cost()
 
     def __repr__(self):
         return self.name
 
-    def set_metadata(self, metadata: dict) -> None:
+    def set_metadata(self, metadata: dict,
+                     nb_drones: int | None) -> None:
+        if not metadata.get('max_drones') and nb_drones:
+            self.max_drones = nb_drones
         for key, value in metadata.items():
             if key == 'color':
                 for c in Colors:
@@ -34,9 +38,6 @@ class Hub():
                         break
             else:
                 self.max_drones = value
-
-    def set_link_capacity(self, max_link_capacity: int = 1) -> None:
-        self.max_link_capacity = max_link_capacity
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:

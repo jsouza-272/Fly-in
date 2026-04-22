@@ -7,16 +7,17 @@ from errors import AstarError
 class Map():
     def __init__(self, nb_drones: int, connections: list[dict],
                  start_hub: dict, end_hub: dict, hub: list[dict] = []):
-        self.map = self.build_map(hub, start_hub, end_hub, connections)
+        self.map = self.build_map(hub, start_hub, end_hub,
+                                  connections, nb_drones)
         self.drones = [Drones(f'D{i + 1}', self.map[0])
                        for i in range(nb_drones)]
         self.map[0].drones.extend(self.drones)
 
     def build_map(self, hub: list[dict], start_hub: dict,
-                  end_hub: dict, connections: list[dict]):
-        hubs = [start_hub, end_hub]
-        hubs.extend(hub)
-        map = [Hub(**h) for h in hubs]
+                  end_hub: dict, connections: list[dict], nb_drones: int):
+        map = [Hub(**start_hub, nb_drones=nb_drones),
+               Hub(**end_hub, nb_drones=nb_drones)]
+        map.extend([Hub(**h) for h in hub])
         for connection in connections:
             node1 = None
             node2 = None
@@ -45,40 +46,39 @@ class Map():
         while self.drones:
             move_message = ''
             for d in self.drones:
-                print(d, d.node, d.node.links, d.destination)
+                # print(d, d.node, d.node.links, d.destination)
                 step = d.destination[-1]
                 if d.node == step:
                     d.destination.pop()
                     step = d.destination[-1]
+                # print(step, len(step.drones), step.max_drones, step.free())
                 if step.free():
                     move_message += d.move(step)
-                    d.destination.pop()
                 elif not step.free() and len(d.node.links) > 1:
                     try:
-                        #print('old', d.destination)
+                        # print(d, 'old', d.destination)
                         new_path = Astar().algorithm(self, [step])
-                        #print('new', new_path)
+                        # print(d, 'new path', new_path)
                         if d.node in new_path:
                             d.destination = new_path[new_path.index(d.node):]
-                            #print('new', d.destination)
+                            # print(d, 'new dest', d.destination)
                             step = d.destination[-1]
                             if d.node == step:
                                 d.destination.pop()
                                 step = d.destination[-1]
                                 move_message += d.move(step)
-                                d.destination.pop()
                             else:
                                 move_message += d.move(step)
-                                d.destination.pop()
                     except AstarError:
-                        #print('\n\nfail\n')
+                        # print(d, 'fail\n')
                         pass
                 else:
                     d.wait()
+                    # print(d, 'wait')
                     #move_message += f"{d} waiting "
                 if not d.destination and d.node == self.map[1]:
                     self.drones.remove(d)
-                    print(d, 'removed')
+                    # print(d, 'removed')
                 # if d.name == 'D2':
                 #    print(d, d.node)
             print(move_message)
