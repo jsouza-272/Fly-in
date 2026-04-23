@@ -3,33 +3,57 @@ from map.hub import Hub
 
 class Drones():
     def __init__(self, name: str, node: Hub):
-        self.name = name
-        self.node = node
-        self.came_from = [node]
-        self.destination = None
+        self.__name = name
+        self.__node = node
+        self.__came_from = [node]
+        self.__destination = None
+
+    @property
+    def name(self) -> str:
+        return self.__name
+
+    @property
+    def node(self) -> Hub:
+        return self.__node
+
+    @property
+    def destination(self) -> list[Hub]:
+        return self.__destination
+
+    @destination.setter
+    def destination(self, new_path: list[Hub]) -> None:
+        if (isinstance(new_path, list)
+                and all([isinstance(_, Hub) for _ in new_path])):
+            self.__destination = new_path[new_path.index(self.__node):]
+        else:
+            raise TypeError('Incompatible type')
+
+    @property
+    def coordinates(self) -> tuple[int, int]:
+        return self.__node.xy
 
     def __repr__(self):
-        return self.name
+        return self.__name
 
     def set_destination(self, path: list[Hub]) -> None:
-        self.destination = path
+        self.__destination = path
 
-    def step(self) -> None:
-        if isinstance(self.destination, list) and self.destination:
-            step = self.destination.pop()
+    def step(self) -> str:
+        if isinstance(self.__destination, list) and self.__destination:
+            step = self.__destination.pop()
             if step.free():
-                self.move(step)
+                return self.move(step)
 
     def move(self, to: Hub) -> str:
-        link = self.node.get_link(to)
+        link = self.__node.get_link(to)
         if link and link.can_use():
-            self.destination.pop()
+            self.__destination.pop()
             link.use()
-            self.came_from.append(to)
+            self.__came_from.append(to)
             self.node.drones.remove(self)
             to.drones.append(self)
             self.node = to
-            return f'{self.name}-{to} '
+            return f'{self.__name}-{to} '
         return ''
 
     def wait(self) -> None:
