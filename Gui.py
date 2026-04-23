@@ -1,4 +1,5 @@
 import pygame
+from pygame.color import THECOLORS
 from map import Map, Hub, Link
 
 
@@ -25,14 +26,28 @@ class Gui():
 
     def loop(self):
         t = True
+        retc = False
         while t:
-            self.clock.tick()
-            fps = self.clock.get_fps()
-            text = self.font.render(str(round(fps, 1)), True, pygame.color.THECOLORS['black'])
-            self.screen.fill(pygame.color.THECOLORS['grey40'])
-            self.screen.blit(text, (20, 20))
-            self._render_map(self.map.map)
+            self.screen.fill(THECOLORS['grey40'])
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     t = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP:
+                        if not retc: retc = True
+                        else: retc = False
+                    if event.key == pygame.K_ESCAPE:
+                        t = False
+            if retc:
+                pygame.draw.rect(self.screen, THECOLORS['black'],
+                                 pygame.Rect(100, 20, 100, 5))
+                pygame.draw.line(self.screen, THECOLORS['black'],
+                                 (70, 70), (150, 150), 10)
+            self.clock.tick()
+            fps = self.clock.get_fps()
+            text = self.font.render(str(round(fps, 1)), True,
+                                    THECOLORS['black'])
+            self.screen.blit(text, (20, 20))
+            self._render_map(self.map.map)
+
         pygame.quit()
