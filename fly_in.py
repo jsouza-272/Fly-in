@@ -1,6 +1,6 @@
 from parser import Parser
 from map.map import Map
-from algorithm.Astar import Astar
+from algorithm import Astar
 import sys
 from Gui import Gui
 from drones import DronesManager
