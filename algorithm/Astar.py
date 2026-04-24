@@ -5,47 +5,49 @@ import math
 
 
 class Astar():
-    def euclidean(self, current: tuple[int, int],
-                  goal: tuple[int, int]) -> int:
-        cx, cy = current
-        gx, gy = goal
-        return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
-
     def algorithm(self, graph: Map,
                   rejected: list[Hub] = []) -> list[Hub]:
-        map = graph.map
-        open_set = {map[0]}
+        open_set = {graph.start_hub}
         close_set = set(rejected)
-        gscore = {map[0]: 0}
-        fscore = {map[0]: 0 + self.euclidean(map[0].xy,
-                                             map[1].xy)}
+        gscore = {graph.start_hub: 0}
+        fscore = {graph.start_hub: 0 + self._euclidean(graph.start_hub.xy,
+                                                       graph.end_hub.xy)}
         camefrom = {}
 
         while open_set:
             currend_node = min(fscore, key=lambda k: fscore[k])
             neighbors = [n.get_next_hub(currend_node)
-                         for n in currend_node.links
+                         for n in currend_node.links.values()
                          if n.get_next_hub(currend_node) not in close_set]
             for n in neighbors:
                 if n not in open_set and not n.blocked:
                     open_set.add(n)
                     gscore[n] = gscore[currend_node] + n.cost
-                    fscore[n] = gscore[n] + self.euclidean(n.xy, map[1].xy)
+                    fscore[n] = gscore[n] + self._euclidean(n.xy,
+                                                            graph.end_hub.xy)
                     camefrom[n] = currend_node
 
                 elif n in gscore and gscore[currend_node] + n.cost < gscore[n]:
                     gscore[n] = gscore[currend_node] + n.cost
-                    fscore[n] = gscore[n] + self.euclidean(n.xy, map[1].xy)
+                    fscore[n] = gscore[n] + self._euclidean(n.xy,
+                                                            graph.end_hub.xy)
                     camefrom[n] = currend_node
 
             open_set.discard(currend_node)
             close_set.add(currend_node)
             fscore.pop(currend_node)
-            if currend_node == map[1]:
-                return self.make_path(camefrom, map[1], map[0])
+            if currend_node == graph.end_hub:
+                return self._make_path(camefrom, graph.end_hub,
+                                       graph.start_hub)
         raise AstarError("Error: path not exist")
 
-    def make_path(self, camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
+    def _euclidean(current: tuple[int, int],
+                   goal: tuple[int, int]) -> int:
+        cx, cy = current
+        gx, gy = goal
+        return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
+
+    def _make_path(camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
         path = [goal]
         current = goal
         while True:

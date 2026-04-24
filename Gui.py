@@ -1,6 +1,6 @@
 import pygame
 from pygame.color import THECOLORS
-from map import Map, Hub, Link
+from map import Map, Hub
 
 
 class Gui():
@@ -34,13 +34,13 @@ class Gui():
                     t = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_UP:
-                        if not retc: retc = True
-                        else: retc = False
+                        if not retc:
+                            retc = True
+                        else:
+                            retc = False
                     if event.key == pygame.K_ESCAPE:
                         t = False
             if retc:
-                pygame.draw.rect(self.screen, THECOLORS['black'],
-                                 pygame.Rect(100, 20, 100, 5))
                 pygame.draw.line(self.screen, THECOLORS['black'],
                                  (70, 70), (150, 150), 10)
             self.clock.tick()

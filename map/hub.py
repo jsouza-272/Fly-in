@@ -12,10 +12,11 @@ class Hub():
         self.zone = Zone.NORMAL
         self.max_drones = 1
         self.drones = []
-        self.links = []
+        self.links = {}
         if metadata:
             self.set_metadata(metadata, nb_drones)
         self.blocked = True if self.zone == Zone.BLOCKED else False
+        self.restricted = True if self.zone == Zone.RESTRICTED else False
         self.set_cost()
 
     def __repr__(self):
@@ -50,16 +51,7 @@ class Hub():
             self.cost = 1
 
     def get_link(self, next: 'Hub'):
-        for link in self.links:
-            if link.get_next_hub(self) == next:
-                return link
-
-    def get_other_link(self, next: 'Hub'):
-        if len(self.links) < 2:
-            return
-        for link in self.links:
-            if link.get_next_hub(self) != next:
-                return link
+        return self.links.get((self, next))
 
     def free(self) -> bool:
         return len(self.drones) < self.max_drones
