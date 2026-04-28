@@ -7,6 +7,8 @@
 
 # Simulacao de turnos #
     fazer drone esperar se for restricted
+    se for restricted o drone demora 2 turnos para chegar ao destino
+    nao preciso esperar na um turno na zona o drone demora 2 turnos para passar pelo connection
 
 
 # GUI #

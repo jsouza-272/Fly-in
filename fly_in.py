@@ -1,9 +1,9 @@
+import sys
 from parser import Parser
 from map.map import Map
-from algorithm import Astar
-import sys
-from Gui import Gui
 from drones import DronesManager
+from algorithm import Astar
+from Gui import Gui
 
 
 ccc = 'maps/challenger/01_the_impossible_dream.txt'
@@ -20,5 +20,5 @@ map = Map(**config)
 drones_manager = DronesManager(config['nb_drones'], map.start_hub)
 drones_manager.set_drones_route(Astar().algorithm(map))
 drones = drones_manager.drones
-#interface = Gui(map)
-#interface.loop()
+# interface = Gui(map)
+# interface.loop()
