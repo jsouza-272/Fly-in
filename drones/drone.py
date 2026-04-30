@@ -6,8 +6,9 @@ class Drone():
         self.__name = name
         self.__node = node
         self.__came_from = [node]
+        self.__coordinates = node.xy
         self.__route = None
-        self.__waiting = False
+        self.__moving = False
 
     def __repr__(self):
         return self.__name
@@ -24,6 +25,9 @@ class Drone():
     def node(self, new_node: Hub) -> None:
         if isinstance(new_node, Hub):
             self.__node = new_node
+            self.coordinates = new_node.xy
+        else:
+            raise TypeError('invalid drone node type')
 
     @property
     def route(self) -> list[Hub]:
@@ -39,30 +43,27 @@ class Drone():
 
     @property
     def coordinates(self) -> tuple[int, int]:
-        return self.__node.xy
+        return self.__coordinates
+
+    @coordinates.setter
+    def coordinates(self, new_coordinate: tuple[int, int]) -> None:
+        if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
+                and all(isinstance(_, int) for _ in new_coordinate)):
+            self.__coordinates = new_coordinate
+        else:
+            raise TypeError('invalid drone coordinate type')
 
     def step(self, to: Hub) -> str:
-        if isinstance(self.__route, list) and self.__route:
-            step = self.__route[-1]
-            if step.restricted and not self.__waiting:
-                self.__waiting = True
-                return self._wait()
-            if (step.free() and step.get_link(to)
-                    and step.get_link(to).can_use()):
-                self.__waiting = False
-                self.__route.pop()
-                return self._move(step)
-            else:
-                return self._wait()
+        pass
 
     def _move(self, to: Hub) -> str:
-        link = self.__node.get_link(to)
+        link = self.__node.links[f'{self.node}-{to}']
         link.use()
         self.__came_from.append(to)
         self.node.drones.remove(self)
         to.drones.append(self)
         self.node = to
-        return f'{self.__name}-{to} '
+        return f'{self.name}-{to} '
 
     def _wait(self) -> None:
         return ''
