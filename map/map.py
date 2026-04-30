@@ -9,7 +9,6 @@ class Map():
                                   connections, nb_drones)
         self.__start_hub = self.map[0]
         self.__end_hub = self.map[1]
-        self.__start_hub.drones.extend(self.drones)
 
     @property
     def start_hub(self) -> Hub:

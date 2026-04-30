@@ -41,12 +41,14 @@ class Astar():
                                        graph.start_hub)
         raise AstarError("Error: path not exist")
 
+    @staticmethod
     def _euclidean(current: tuple[int, int],
                    goal: tuple[int, int]) -> int:
         cx, cy = current
         gx, gy = goal
         return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
 
+    @staticmethod
     def _make_path(camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
         path = [goal]
         current = goal

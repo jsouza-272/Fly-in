@@ -1,5 +1,6 @@
 # Parser #
     ver se o parser ta certo
+    mudar o check dos metadatas
     mudar colors para a constante do pygame
     start_hub nao pode ser blocked
     end_hub nao pode ser blocked

@@ -72,9 +72,12 @@ start_hub need name')
                         self.check_coordinates(start_hub['start_hub']['x'],
                                                start_hub['start_hub']['x'])
                         try:
-                            start_hub['start_hub'].update(
-                                self.check_hub_metadata(
-                                    {'metadata': line.split(maxsplit=4)[4]}))
+                            metadata = self.check_hub_metadata(
+                                {'metadata': line.split(maxsplit=4)[4]})
+                            if metadata['metadata'].get('zone') == 'blocked':
+                                raise ParserError('Start zone cannot '
+                                                  'be blocked')
+                            start_hub['start_hub'].update(metadata)
                         except IndexError:
                             pass
             if not ctrl:
@@ -112,8 +115,12 @@ end_hub need name')
                         self.check_coordinates(end_hub['end_hub']['x'],
                                                end_hub['end_hub']['y'])
                         try:
-                            end_hub['end_hub'].update(self.check_hub_metadata(
-                                {'metadata': line.split(maxsplit=4)[4]}))
+                            metadata = self.check_hub_metadata(
+                                {'metadata': line.split(maxsplit=4)[4]})
+                            if metadata['metadata'].get('zone') == 'blocked':
+                                raise ParserError('End zone cannot '
+                                                  'be blocked')
+                            end_hub['end_hub'].update(metadata)
                         except IndexError:
                             pass
             if not ctrl:
