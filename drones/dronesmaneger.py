@@ -33,7 +33,4 @@ class DronesManager():
         if not route:
             raise ValueError('route must not be empty')
         for drone in self.__drones:
-            if route[-1] == drone.node:
-                drone.route = route.copy()[:-1]
-            else:
-                drone.route = route.copy()
+            drone.route = route.copy()

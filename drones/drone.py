@@ -2,12 +2,11 @@ from map.hub import Hub
 
 
 class Drone():
-    def __init__(self, name: str, node: Hub):
+    def __init__(self, name: str, node: Hub | None):
         self.__name = name
+        self.__coordinates = None
         self.__node = node
-        self.__came_from = [node]
-        self.__coordinates = node.xy
-        self.__route = None
+        self.__route = []
         self.__moving = False
 
     def __repr__(self):
@@ -26,6 +25,9 @@ class Drone():
         if isinstance(new_node, Hub):
             self.__node = new_node
             self.coordinates = new_node.xy
+        elif not new_node:
+            self.__node = new_node
+            self.coordinates = None
         else:
             raise TypeError('invalid drone node type')
 
@@ -37,7 +39,10 @@ class Drone():
     def route(self, new_route: list[Hub]) -> None:
         if (isinstance(new_route, list)
                 and all(isinstance(_, Hub) for _ in new_route)):
-            self.__route = new_route
+            if self.node and self.node in new_route:
+                self.__route = new_route[:new_route.index(self.node)]
+            else:
+                raise ValueError('Invalid route')
         else:
             raise TypeError('route must be a list of Hub objects')
 
@@ -50,20 +55,27 @@ class Drone():
         if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
                 and all(isinstance(_, int) for _ in new_coordinate)):
             self.__coordinates = new_coordinate
+        elif not self.coordinates:
+            self.__coordinates = None
         else:
             raise TypeError('invalid drone coordinate type')
 
-    def step(self, to: Hub) -> str:
-        pass
-
-    def _move(self, to: Hub) -> str:
-        link = self.__node.links[f'{self.node}-{to}']
-        link.use()
-        self.__came_from.append(to)
-        self.node.drones.remove(self)
-        to.drones.append(self)
-        self.node = to
-        return f'{self.name}-{to} '
+    def walk(self) -> str:
+        goal = self.route[-1]
+        link = goal.links[f'{goal}-{self.node}']
+        if goal.blocked:
+            raise ValueError('PANIC')
+        if self.__moving:
+            pass
+        elif goal.restricted and goal.free() and link.can_use():
+            self.node.drones.remove(self)
+            link.use()
+            self.__moving = True
+        elif goal.free() and link.can_use():
+            goal.drones.append(self)
+            link.use()
+            self.node.drones.remove(self)
+            return f'{self}-{goal}'
 
     def _wait(self) -> None:
-        return ''
+        return f'{self.name} waiting'

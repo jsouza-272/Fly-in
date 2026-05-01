@@ -13,14 +13,28 @@ class Hub():
         self.max_drones = 1
         self.drones = []
         self.links = {}
+        self.__reserved = False
         if metadata:
             self.set_metadata(metadata, nb_drones)
         self.blocked = True if self.zone == Zone.BLOCKED else False
         self.restricted = True if self.zone == Zone.RESTRICTED else False
         self.set_cost()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.name
+
+    @property
+    def reserved(self) -> bool:
+        return self.__reserved
+
+    @reserved.setter
+    def reserved(self, reserve: bool) -> None:
+        if self.__reserved and reserve:
+            raise ValueError('fail')
+        elif not reserve and not self.__reserved:
+            raise ValueError("fail")
+        else:
+            self.__reserved = reserve
 
     def set_metadata(self, metadata: dict,
                      nb_drones: int | None) -> None:
@@ -54,7 +68,10 @@ class Hub():
         return self.links.get((self, next))
 
     def free(self) -> bool:
-        return len(self.drones) < self.max_drones
+        if self.__reserved:
+            return len(self.drones) + 1 < self.max_drones
+        else:
+            return len(self.drones) < self.max_drones
 
     def reset_links(self) -> None:
         for link in self.links:

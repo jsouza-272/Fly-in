@@ -2,8 +2,6 @@
     ver se o parser ta certo
     mudar o check dos metadatas
     mudar colors para a constante do pygame
-    start_hub nao pode ser blocked
-    end_hub nao pode ser blocked
 
 
 # Drones #
@@ -13,7 +11,17 @@
         - ver se o node atual esta na nova rota
         - nova rota ser do node atual + 1 pra frente
     adicionar uma funcao de recalcular a rota do drone (provavelmente em DroneManeger)
+    fazer algo com o setter do node para quando o drone estiver no link
  
+
+# Hub #
+    fazer uma flag que diz que esta esperando um drone
+
+
+# Links #
+    fazer algo para resetar so os links que nao estiverem sendo usados
+    mudar como funciona quais drones estao nos links
+
 
 # Simulacao de turnos #
     fazer drone ir para connection se for restricted

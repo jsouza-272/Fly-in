@@ -19,9 +19,12 @@ class Gui():
     def _render_map(self, map: list[Hub]):
         for hub in map:
             xy = (hub.xy[0] * 70 + 100, hub.xy[1] * 70 + 300)
+            pygame.draw.rect(self.screen, pygame.Color('black'),
+                             pygame.Rect(xy[0] - 20, xy[1] - 20, 40, 40),
+                             border_radius=10)
             pygame.draw.circle(self.screen,
-                               pygame.color.THECOLORS[hub.color.value],
-                               xy, 20)
+                               pygame.Color(hub.color.value),
+                               xy, 21)
         pygame.display.flip()
 
     def loop(self):
