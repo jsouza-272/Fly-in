@@ -7,11 +7,9 @@
 # Drones #
     fazer o drone se mover
     atualizar a coordenada do drone se ele estiver em uma connection por causa de uma zona restricted
-    adicionar as verificacoes do setter de route do drone
-        - ver se o node atual esta na nova rota
-        - nova rota ser do node atual + 1 pra frente
     adicionar uma funcao de recalcular a rota do drone (provavelmente em DroneManeger)
     fazer algo com o setter do node para quando o drone estiver no link
+    mudar a funcao walk para ser de um node para outro (def walk(self, to_node: Hub, link_to_use: Link) )
  
 
 # Hub #
@@ -23,6 +21,11 @@
     mudar como funciona quais drones estao nos links
 
 
+# Emulation #
+    fazer a funcao que percorre todos os drones e fala para eles andarem
+    fazer uma lista de drones que chegaram no fim
+
+
 # Simulacao de turnos #
     fazer drone ir para connection se for restricted
     se for restricted o drone demora 2 turnos para chegar ao destino
@@ -32,3 +35,4 @@
 # GUI #
     usar circulos/quadrados (ver oque fica melhor) para os hub
     usar linhas para as connections
+    pensar em como fazer os drones se moverem (talves somar 0.2 se nao for restricted e 0.1 se for)

@@ -10,3 +10,6 @@ class SimulationEngine():
         self.__start_hub = map.start_hub
         self.__end_hub = map.end_hub
         self.__map = map
+
+    def turn(self):
+        pass

@@ -25,7 +25,7 @@ class Drone():
         if isinstance(new_node, Hub):
             self.__node = new_node
             self.coordinates = new_node.xy
-        elif not new_node:
+        elif not new_node and self.__moving:
             self.__node = new_node
             self.coordinates = None
         else:
@@ -55,27 +55,36 @@ class Drone():
         if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
                 and all(isinstance(_, int) for _ in new_coordinate)):
             self.__coordinates = new_coordinate
-        elif not self.coordinates:
+        elif not self.coordinates and self.__moving:
             self.__coordinates = None
         else:
             raise TypeError('invalid drone coordinate type')
 
+    @property
+    def moving(self) -> bool:
+        return self.__moving
+
     def walk(self) -> str:
+        if not self.route:
+            return ''
         goal = self.route[-1]
         link = goal.links[f'{goal}-{self.node}']
         if goal.blocked:
             raise ValueError('PANIC')
         if self.__moving:
-            pass
+            self.node = goal
+            goal.drones.append(self)
+            self.__moving = False
+            return f'{self}-{goal}'
         elif goal.restricted and goal.free() and link.can_use():
             self.node.drones.remove(self)
             link.use()
             self.__moving = True
+            self.node = None
+            return f'{link}'
         elif goal.free() and link.can_use():
             goal.drones.append(self)
             link.use()
             self.node.drones.remove(self)
+            self.route.pop()
             return f'{self}-{goal}'
-
-    def _wait(self) -> None:
-        return f'{self.name} waiting'

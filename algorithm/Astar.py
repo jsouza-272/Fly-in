@@ -1,12 +1,12 @@
 from map.hub import Hub
 from map.map import Map
 from errors import AstarError
+from .algorithm import Algorithm
 import math
 
 
-class Astar():
-    def algorithm(self, graph: Map,
-                  rejected: list[Hub] = []) -> list[Hub]:
+class Astar(Algorithm):
+    def algorithm(self, graph: Map, rejected: list[Hub] = []) -> list[Hub]:
         open_set = {graph.start_hub}
         close_set = set(rejected)
         gscore = {graph.start_hub: 0}
