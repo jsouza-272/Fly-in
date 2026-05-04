@@ -25,11 +25,16 @@ class DronesManager():
     def moving_drones(self) -> list[Drone]:
         return [d for d in self.drones if d.moving]
 
+    @property
+    def end_drones(self) -> list[Drone]:
+        return [d for d in self.__drones if len(d.route) == 0]
+
     def create_drones(self, nb_drones: int, start_drone_position: Hub,
                       name_patern: str = 'D') -> None:
         self.__drones.extend([Drone(name_patern + str(n + 1),
                                     start_drone_position)
                               for n in range(nb_drones)])
+        start_drone_position.drones.extend(self.__drones)
 
     def set_drones_route(self, route: list[Hub]) -> None:
         if (not isinstance(route, list)
@@ -42,3 +47,17 @@ class DronesManager():
 
     def recalculate_route(self, drone: Drone, algorithm: Algorithm) -> None:
         pass
+
+    def move_drone(self, drone: Drone) -> str:
+        msg = ''
+        if isinstance(drone, Drone) and len(drone.route) > 0:
+            node = drone.route[-1]
+            if drone.name == 'D2':
+                print(drone, drone.route)
+                print(drone, node)
+            # if not node.free() and node.links.get((node, drone.route[-1])):
+            msg = drone.move(node)
+            if not drone.moving and msg:
+                drone.route.pop()
+        return msg
+

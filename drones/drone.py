@@ -21,7 +21,7 @@ class Drone():
         return self.__node
 
     @node.setter
-    def node(self, new_node: Hub) -> None:
+    def node(self, new_node: Hub | None) -> None:
         if isinstance(new_node, Hub):
             self.__node = new_node
             self.coordinates = new_node.xy
@@ -64,27 +64,29 @@ class Drone():
     def moving(self) -> bool:
         return self.__moving
 
-    def walk(self) -> str:
-        if not self.route:
-            return ''
-        goal = self.route[-1]
-        link = goal.links[f'{goal}-{self.node}']
-        if goal.blocked:
-            raise ValueError('PANIC')
-        if self.__moving:
-            self.node = goal
-            goal.drones.append(self)
-            self.__moving = False
-            return f'{self}-{goal}'
-        elif goal.restricted and goal.free() and link.can_use():
-            self.node.drones.remove(self)
-            link.use()
-            self.__moving = True
-            self.node = None
-            return f'{link}'
-        elif goal.free() and link.can_use():
-            goal.drones.append(self)
-            link.use()
-            self.node.drones.remove(self)
-            self.route.pop()
-            return f'{self}-{goal}'
+    def move(self, to: Hub) -> str:
+        link = self.node.links.get((self.node, to))
+        msg = f'{self}-wait'
+        if (not isinstance(to, Hub) or not link or to not in self.route
+            or to.blocked):
+            raise TypeError(f'invalid, {to} {link} {self.node} {self.route} {self.node.links}')
+        if to.free() and link.can_use():
+            if to.restricted and not to.reserved and not self.moving:
+                to.reserved
+                self.node.drones.remove(self)
+                link.use()
+                self.__moving = True
+                self.node = None
+            elif self.moving:
+                to.reserved = False
+                self.__moving = False
+                self.node = to
+                to.drones.append(self)
+                msg = f'{self}-{to} '
+            elif not to.restricted:
+                self.node.drones.remove(self)
+                link.use()
+                to.drones.append(self)
+                self.node = to
+                msg = f'{self}-{to} '
+        return msg, 

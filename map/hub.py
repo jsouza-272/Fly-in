@@ -1,5 +1,10 @@
 from zones import Zone
 from colors import Colors
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from .map import Link
 
 
 class Hub():
@@ -12,7 +17,7 @@ class Hub():
         self.zone = Zone.NORMAL
         self.max_drones = 1
         self.drones = []
-        self.links = {}
+        self.links: dict[str, 'Link'] = {}
         self.__reserved = False
         if metadata:
             self.set_metadata(metadata, nb_drones)
@@ -64,7 +69,7 @@ class Hub():
         else:
             self.cost = 1
 
-    def get_link(self, next: 'Hub'):
+    def get_link(self, next: 'Hub') -> 'Link':
         return self.links.get((self, next))
 
     def free(self) -> bool:

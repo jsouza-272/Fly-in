@@ -4,6 +4,10 @@
     mudar colors para a constante do pygame
 
 
+# DronesManager #
+    fazer um metodo para recalcular rota
+    recalcula apartir do node atual
+
 # Drones #
     fazer o drone se mover
     atualizar a coordenada do drone se ele estiver em uma connection por causa de uma zona restricted
