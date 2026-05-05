@@ -79,5 +79,5 @@ class Hub():
             return len(self.drones) < self.max_drones
 
     def reset_links(self) -> None:
-        for link in self.links:
+        for link in self.links.values():
             link.reset_usage()

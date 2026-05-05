@@ -49,15 +49,14 @@ class DronesManager():
         pass
 
     def move_drone(self, drone: Drone) -> str:
+        drone_move_info = None
         msg = ''
         if isinstance(drone, Drone) and len(drone.route) > 0:
             node = drone.route[-1]
-            if drone.name == 'D2':
-                print(drone, drone.route)
-                print(drone, node)
-            # if not node.free() and node.links.get((node, drone.route[-1])):
-            msg = drone.move(node)
-            if not drone.moving and msg:
-                drone.route.pop()
+            link = node.links.get((node, drone.node))
+            drone_move_info = drone.move(node, link)
+            msg = drone_move_info[0]
+            if drone_move_info[1] and drone_move_info[1] in drone.route:
+                drone.route.remove(drone_move_info[1])
         return msg
 

@@ -13,14 +13,17 @@ class SimulationEngine():
         self.__map = map
 
     def turn(self):
-        i = 0
+        turn_counter = 0
         drones = self.__drones
         d_manager = self.__drones_manager
         while len(drones) != len(d_manager.end_drones):
             turn_msg = ''
-            i += 1
+            turn_counter += 1
             for drone in drones:
                 turn_msg += d_manager.move_drone(drone)
-            print(turn_msg, i)
-            if i == 5:
+            print(turn_msg)
+            self.__map.reset_links()
+            if turn_counter == 6:
                 break
+        print(turn_counter)
+

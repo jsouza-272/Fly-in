@@ -1,4 +1,5 @@
-from map.hub import Hub
+from map import Hub
+from map import Link
 
 
 class Drone():
@@ -52,11 +53,11 @@ class Drone():
 
     @coordinates.setter
     def coordinates(self, new_coordinate: tuple[int, int]) -> None:
-        if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
+        if self.__moving:
+            self.__coordinates = None
+        elif (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
                 and all(isinstance(_, int) for _ in new_coordinate)):
             self.__coordinates = new_coordinate
-        elif not self.coordinates and self.__moving:
-            self.__coordinates = None
         else:
             raise TypeError('invalid drone coordinate type')
 
@@ -64,29 +65,41 @@ class Drone():
     def moving(self) -> bool:
         return self.__moving
 
-    def move(self, to: Hub) -> str:
-        link = self.node.links.get((self.node, to))
-        msg = f'{self}-wait'
-        if (not isinstance(to, Hub) or not link or to not in self.route
-            or to.blocked):
-            raise TypeError(f'invalid, {to} {link} {self.node} {self.route} {self.node.links}')
-        if to.free() and link.can_use():
-            if to.restricted and not to.reserved and not self.moving:
-                to.reserved
+    def move(self, to_node: Hub, link_to_use: Link) -> tuple[str, None | Hub]:
+        msg = f'{self}-wait '
+        node_to_remove = None
+        if not isinstance(to_node, Hub):
+            raise TypeError('invalid node \"to_node\"', to_node)
+        if not link_to_use and not self.__moving:
+            raise TypeError(self, 'Link not exist', self.node, to_node)
+        if to_node not in self.route:
+            raise TypeError(to_node, 'not in route')
+        if to_node.blocked:
+            raise TypeError('PANIC')
+        # if self.moving:
+        #     print(self.node, to_node, link_to_use)
+        if to_node.free() and link_to_use.can_use():
+            if (to_node.restricted and not to_node.reserved
+                    and not self.moving):
+                msg = f'{self}-moving '
+                to_node.reserved = True
                 self.node.drones.remove(self)
-                link.use()
+                link_to_use.use()
                 self.__moving = True
                 self.node = None
-            elif self.moving:
-                to.reserved = False
-                self.__moving = False
-                self.node = to
-                to.drones.append(self)
-                msg = f'{self}-{to} '
-            elif not to.restricted:
+            elif not to_node.restricted:
                 self.node.drones.remove(self)
-                link.use()
-                to.drones.append(self)
-                self.node = to
-                msg = f'{self}-{to} '
-        return msg, 
+                link_to_use.use()
+                to_node.drones.append(self)
+                node_to_remove = to_node
+                self.node = to_node
+                msg = f'{self}-{to_node} '
+        elif self.moving:
+                to_node.reserved = False
+                self.__moving = False
+                node_to_remove = to_node
+                self.node = to_node
+                to_node.drones.append(self)
+                msg = f'{self}-{to_node} '
+                # print(node_to_remove, to_node)
+        return msg, node_to_remove
