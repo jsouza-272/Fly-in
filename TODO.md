@@ -2,6 +2,8 @@
     ver se o parser ta certo
     mudar o check dos metadatas
     mudar colors para a constante do pygame
+    criar constantes para o parser
+    usar Enum para instanciar a Classe
 
 
 # DronesManager #
