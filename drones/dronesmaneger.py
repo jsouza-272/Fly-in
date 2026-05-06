@@ -55,7 +55,6 @@ class DronesManager():
             if new_route[:-1] == drone.route:
                 return False
             if len(new_route[:-1]) <= len(drone.route) + 2:
-                print(drone.node, drone.moving, new_route)
                 drone.route = new_route
                 return True
             else:

@@ -69,7 +69,7 @@ class Drone():
         return self.__moving
 
     def move(self, to_node: Hub, link_to_use: Link) -> tuple[str, None | Hub]:
-        msg = f'{self}-wait '
+        msg = ''
         node_to_remove = None
         if not isinstance(to_node, Hub):
             raise TypeError('invalid node \"to_node\"', to_node)
@@ -79,30 +79,27 @@ class Drone():
             raise TypeError(to_node, 'not in route')
         if to_node.blocked:
             raise TypeError('PANIC')
-        # if self.moving:
-        #     print(self.node, to_node, link_to_use)
-        if to_node.free() and link_to_use.can_use():
-            if (to_node.restricted and not to_node.reserved
-                    and not self.moving):
+        if self.moving:
+            to_node.reserved = False
+            self.__moving = False
+            node_to_remove = to_node
+            self.node = to_node
+            to_node.drones.append(self)
+            msg = f'{self}-{to_node} '
+        elif to_node.restricted and (link_to_use.can_use() or to_node.free()):
+            if not to_node.reserved and not self.moving:
                 msg = f'{self}-moving '
                 to_node.reserved = True
                 self.node.drones.remove(self)
                 link_to_use.use()
                 self.__moving = True
                 self.node = None
-            elif not to_node.restricted:
+        elif to_node.free() and link_to_use.can_use():
+            if not to_node.restricted:
                 self.node.drones.remove(self)
                 link_to_use.use()
                 to_node.drones.append(self)
                 node_to_remove = to_node
                 self.node = to_node
                 msg = f'{self}-{to_node} '
-        elif self.moving:
-                to_node.reserved = False
-                self.__moving = False
-                node_to_remove = to_node
-                self.node = to_node
-                to_node.drones.append(self)
-                msg = f'{self}-{to_node} '
-                # print(node_to_remove, to_node)
         return msg, node_to_remove

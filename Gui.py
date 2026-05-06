@@ -51,6 +51,9 @@ class Gui():
                     if event.key == pygame.K_n:
                         t = False
                         return_value = 'n'
+                    if event.key == pygame.K_b:
+                        t = False
+                        return_value = 'b'
 
             if retc:
                 pygame.draw.line(self.screen, THECOLORS['black'],

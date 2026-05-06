@@ -17,12 +17,14 @@ def bloom(path: str):
         sys.exit(1)
     map = Map(**config)
     drones_manager = DronesManager(config['nb_drones'], map.start_hub,
-                                    create_drones=True)
+                                   create_drones=True)
     drones_manager.set_drones_route(Astar().algorithm(map))
+
     engine = SimulationEngine(map, drones_manager)
     engine.turn()
-    #interface = Gui(map, path.split('/', maxsplit=1)[-1])
-    #return interface.loop()
+    print('nb_drones:', config['nb_drones'])
+    interface = Gui(map, path.split('/', maxsplit=1)[-1])
+    return interface.loop()
 
 
 user_input = 'n'
@@ -49,8 +51,5 @@ while user_input != 'q':
         print('END')
         break
     if user_input == 'n':
-        print(path_list[i].split('/', maxsplit=1)[-1])
-        print()
         user_input = bloom(path_list[i])
         i += 1
-    user_input = input()

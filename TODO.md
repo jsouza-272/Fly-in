@@ -13,10 +13,11 @@
 # Drones #
     atualizar a coordenada do drone se ele estiver em uma connection por causa de uma zona restricted
     fazer o outro Drone comecar a se mover apos o outro Drone chegar no Hub de destino se a Zona for restricted
+    D2 pode estar moving no segundo turno (maps/medium/02)
 
 
 # Hub #
-    fazer uma flag que diz que esta esperando um drone
+    mudar a flag que diz que esta esperando um drone para suportar mais de um
 
 
 # Links #
@@ -30,8 +31,12 @@
 
 # Simulacao de turnos #
 
-
 # GUI #
     usar circulos/quadrados (ver oque fica melhor) para os hub
     usar linhas para as connections
     pensar em como fazer os drones se moverem (talves somar 0.2 se nao for restricted e 0.1 se for)
+
+
+# Geral #
+    refatorar TUDO
+    Fazer error personalizados para todos os erros
