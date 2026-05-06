@@ -1,5 +1,6 @@
 from map import Hub
 from map import Link
+from errors import DroneRunningError
 
 
 class Drone():
@@ -40,8 +41,10 @@ class Drone():
     def route(self, new_route: list[Hub]) -> None:
         if (isinstance(new_route, list)
                 and all(isinstance(_, Hub) for _ in new_route)):
-            if self.node and self.node in new_route:
+            if self.node and not self.moving and self.node in new_route:
                 self.__route = new_route[:new_route.index(self.node)]
+            elif not self.node and self.moving:
+                raise DroneRunningError("cant change route")
             else:
                 raise ValueError('Invalid route')
         else:

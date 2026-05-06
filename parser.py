@@ -1,6 +1,6 @@
 from colors import Colors
 from zones import Zone
-from errors import ParserError
+from errors.anyerrors import ParserError
 from typing import Any
 
 

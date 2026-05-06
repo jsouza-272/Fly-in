@@ -1,6 +1,7 @@
 from map import Map, Hub, Link
 from drones import DronesManager, Drone
 from algorithm import Astar
+from errors.anyerrors import RecalculateRoute
 
 
 class SimulationEngine():
@@ -20,10 +21,15 @@ class SimulationEngine():
             turn_msg = ''
             turn_counter += 1
             for drone in drones:
-                turn_msg += d_manager.move_drone(drone)
+                try:
+                    turn_msg += d_manager.move_drone(drone)
+                except RecalculateRoute:
+                    recalculate_result = d_manager.recalculate_route(
+                        drone, Astar(), self.__map)
+                    if recalculate_result:
+                        turn_msg += d_manager.move_drone(drone, False)
+                    else:
+                        turn_msg += d_manager.move_drone(drone, False)
             print(turn_msg)
             self.__map.reset_links()
-            if turn_counter == 6:
-                break
         print(turn_counter)
-

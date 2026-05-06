@@ -1,6 +1,7 @@
 from .drone import Drone
-from map import Hub
+from map import Hub, Map
 from algorithm import Algorithm
+from errors import RecalculateRoute, AlgorithmError
 
 
 class DronesManager():
@@ -45,18 +46,33 @@ class DronesManager():
         for drone in self.__drones:
             drone.route = route.copy()
 
-    def recalculate_route(self, drone: Drone, algorithm: Algorithm) -> None:
-        pass
+    def recalculate_route(self, drone: Drone,
+                          algorithm: Algorithm, map: Map) -> bool:
+        if drone.moving:
+            return False
+        try:
+            new_route = algorithm.algorithm(map, [drone.route[-1]], drone.node)
+            if new_route[:-1] == drone.route:
+                return False
+            if len(new_route[:-1]) <= len(drone.route) + 2:
+                print(drone.node, drone.moving, new_route)
+                drone.route = new_route
+                return True
+            else:
+                return False
+        except AlgorithmError:
+            return False
 
-    def move_drone(self, drone: Drone) -> str:
+    def move_drone(self, drone: Drone, try_recalc_route: bool = True) -> str:
         drone_move_info = None
         msg = ''
         if isinstance(drone, Drone) and len(drone.route) > 0:
             node = drone.route[-1]
             link = node.links.get((node, drone.node))
+            if try_recalc_route and (not node.free() or not link.can_use()):
+                raise RecalculateRoute()
             drone_move_info = drone.move(node, link)
             msg = drone_move_info[0]
             if drone_move_info[1] and drone_move_info[1] in drone.route:
                 drone.route.remove(drone_move_info[1])
         return msg
-

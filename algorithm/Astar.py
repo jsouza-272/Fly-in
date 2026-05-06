@@ -1,6 +1,6 @@
 from map.hub import Hub
 from map.map import Map
-from errors import AstarError
+from errors import CantSolveGraphError
 from .algorithm import Algorithm
 import math
 
@@ -41,7 +41,7 @@ class Astar(Algorithm):
             if currend_node == end_hub:
                 return self._make_path(camefrom, end_hub,
                                        start_hub)
-        raise AstarError("Error: path not exist")
+        raise CantSolveGraphError("Error: path not exist")
 
     @staticmethod
     def _euclidean(current: tuple[int, int],
