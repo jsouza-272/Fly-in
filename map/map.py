@@ -18,6 +18,14 @@ class Map():
     def end_hub(self) -> Hub:
         return self.__end_hub
 
+    @property
+    def map_size(self) -> tuple[int, int]:
+        max_x = max(self.map, key=lambda hub: hub.xy[0]).xy[0]
+        max_y = max(self.map, key=lambda hub: hub.xy[1]).xy[1]
+        min_x = min(self.map, key=lambda hub: hub.xy[0]).xy[0]
+        min_y = min(self.map, key=lambda hub: hub.xy[1]).xy[1]
+        return (max_x - min_x, max_y - min_y)
+
     def build_map(self, hub: list[dict], start_hub: dict,
                   end_hub: dict, connections: list[dict],
                   nb_drones: int) -> list[Hub]:

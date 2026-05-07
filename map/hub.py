@@ -1,7 +1,7 @@
 from zones import Zone
 from colors import Colors
 from typing import TYPE_CHECKING
-
+from math import inf
 
 if TYPE_CHECKING:
     from .map import Link
@@ -61,9 +61,7 @@ class Hub():
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
-            self.cost = 999
-        elif self.zone == Zone.PRIORITY:
-            self.cost = -1
+            self.cost = inf
         elif self.zone == Zone.RESTRICTED:
             self.cost = 10
         else:

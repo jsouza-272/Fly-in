@@ -10,7 +10,7 @@ class Gui():
         self.height = height
         self.map = map
         self.screen = self._start(title)
-        self.font = pygame.font.SysFont(None, 32)
+        self.font = pygame.font.SysFont(None, 13)
         self.clock = pygame.time.Clock()
 
     def _start(self, title: str) -> pygame.Surface:
@@ -18,15 +18,33 @@ class Gui():
         pygame.display.set_caption(title)
         return pygame.display.set_mode((self.width, self.height))
 
+    def _calc_scale(self, offset: int) -> int:
+        map_x, map_y = self.map.map_size
+        map_x = 1 if map_x == 0 else map_x
+        map_y = 1 if map_y == 0 else map_y
+        screen_x = self.screen.get_width() - 2*offset
+        screen_y = self.screen.get_height() - 2*offset
+        possible_scale = min(screen_x / map_x, screen_y / map_y)
+        if possible_scale >= 60:
+            scale = 70
+        else:
+            scale = possible_scale
+        return scale
+
     def _render_map(self, map: list[Hub]):
+        offset = 50
+        scale = self._calc_scale(offset)
+        print(scale)
         for hub in map:
-            xy = (hub.xy[0] * 70 + 100, hub.xy[1] * 70 + 300)
+            x, y = hub.xy
+            nx = (x * scale) + offset
+            ny = (self.screen.get_height() / 2) - (y * scale)
             pygame.draw.rect(self.screen, pygame.Color('black'),
-                             pygame.Rect(xy[0] - 20, xy[1] - 20, 40, 40),
+                             pygame.Rect(nx - 20, ny - 20, 40, 40),
                              border_radius=10)
             pygame.draw.circle(self.screen,
                                pygame.Color(hub.color.value),
-                               xy, 21)
+                               (nx, ny), 21)
         pygame.display.flip()
 
     def loop(self):

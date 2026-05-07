@@ -88,7 +88,6 @@ class Drone():
             msg = f'{self}-{to_node} '
         elif to_node.restricted and (link_to_use.can_use() or to_node.free()):
             if not to_node.reserved and not self.moving:
-                msg = f'{self}-moving '
                 to_node.reserved = True
                 self.node.drones.remove(self)
                 link_to_use.use()

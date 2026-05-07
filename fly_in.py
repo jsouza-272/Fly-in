@@ -1,4 +1,5 @@
 import sys
+import time
 from parser import Parser
 from map import Map, Hub, Link
 from drones import DronesManager
@@ -19,11 +20,11 @@ def bloom(path: str):
     drones_manager = DronesManager(config['nb_drones'], map.start_hub,
                                    create_drones=True)
     drones_manager.set_drones_route(Astar().algorithm(map))
-
     engine = SimulationEngine(map, drones_manager)
     engine.turn()
     print('nb_drones:', config['nb_drones'])
     interface = Gui(map, path.split('/', maxsplit=1)[-1])
+    print(Astar().algorithm(map))
     return interface.loop()
 
 
