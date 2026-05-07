@@ -1,5 +1,5 @@
-from map import Map, Hub, Link
-from drones import DronesManager, Drone
+from map import Map
+from drones import DronesManager
 from algorithm import Astar
 from errors.anyerrors import RecalculateRoute
 

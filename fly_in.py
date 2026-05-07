@@ -1,7 +1,6 @@
 import sys
-import time
 from parser import Parser
-from map import Map, Hub, Link
+from map import Map
 from drones import DronesManager
 from algorithm import Astar
 from emulation import SimulationEngine
