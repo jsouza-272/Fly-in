@@ -9,8 +9,7 @@
 # DronesManager #
 
 # Drones #
-    atualizar a coordenada do drone se ele estiver em uma connection por causa de uma zona restricted
-    fazer o outro Drone comecar a se mover apos o outro Drone chegar no Hub de destino se a Zona for restricted
+    ter um old node e um new node para calcular a coordenada do drone caso ele esteja moving
 
 
 # Hub #
