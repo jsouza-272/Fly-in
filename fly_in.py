@@ -27,7 +27,7 @@ def bloom(path: str):
     return interface.loop()
 
 
-user_input = 'n'
+user_input = ""
 i = 0
 path_list = [
     'maps/easy/01_linear_path.txt',
@@ -46,10 +46,9 @@ while user_input != 'q':
     if user_input == 'b':
         if i > 0:
             i -= 1
-            user_input = 'n'
     if i == len(path_list):
         print('END')
         break
     if user_input == 'n':
-        user_input = bloom(path_list[i])
         i += 1
+    user_input = bloom(path_list[i])
