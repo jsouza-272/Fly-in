@@ -6,6 +6,12 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "flake8>=7.3.0",
+    "flake8-pyproject>=1.2.4",
     "mypy>=1.20.2",
     "pygame>=2.6.1",
+]
+
+[tool.flake8]
+extend-exclude = [
+    ".venv",
 ]

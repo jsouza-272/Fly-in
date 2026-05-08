@@ -6,7 +6,7 @@ from errors import DroneRunningError
 class Drone():
     def __init__(self, name: str, node: Hub | None):
         self.__name = name
-        self.__coordinates = None
+        self.__coordinates = node.xy if node else None
         self.__node = node
         self.__route = []
         self.__moving = False
@@ -23,13 +23,15 @@ class Drone():
         return self.__node
 
     @node.setter
-    def node(self, new_node: Hub | None) -> None:
-        if isinstance(new_node, Hub):
+    def node(self, new_node: Hub) -> None:
+        if isinstance(new_node, Hub) and not self.__moving:
             self.__node = new_node
             self.coordinates = new_node.xy
-        elif not new_node and self.__moving:
-            self.__node = new_node
-            self.coordinates = None
+        elif isinstance(new_node, Hub) and self.__moving:
+            new_x = (self.__node.xy[0] + new_node.xy[0]) / 2
+            new_y = (self.__node.xy[1] + new_node.xy[1]) / 2
+            self.coordinates = (new_x, new_y)
+            self.__node = None
         else:
             raise TypeError('invalid drone node type')
 
@@ -56,10 +58,8 @@ class Drone():
 
     @coordinates.setter
     def coordinates(self, new_coordinate: tuple[int, int]) -> None:
-        if self.__moving:
-            self.__coordinates = None
-        elif (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
-                and all(isinstance(_, int) for _ in new_coordinate)):
+        if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
+                and all(isinstance(_, (int, float)) for _ in new_coordinate)):
             self.__coordinates = new_coordinate
         else:
             raise TypeError('invalid drone coordinate type')
@@ -92,7 +92,7 @@ class Drone():
                 self.node.drones.remove(self)
                 link_to_use.use()
                 self.__moving = True
-                self.node = None
+                self.node = to_node
         elif to_node.free() and link_to_use.can_use():
             if not to_node.restricted:
                 self.node.drones.remove(self)

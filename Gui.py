@@ -1,14 +1,18 @@
 import pygame
 from pygame.color import THECOLORS
 from map import Map, Hub, Link
+from drones import Drone
+from emulation import SimulationEngine
 
 
 class Gui():
     def __init__(self, map: Map, title: str,
-                 width: int = 1280, height: int = 720):
+                 emulator: SimulationEngine,
+                 width: int = 1280, height: int = 720,):
         self.width = width
         self.height = height
         self.map = map
+        self.emulator = emulator
         self.screen = self._start(title)
         self.font = pygame.font.SysFont(None, 13)
         self.clock = pygame.time.Clock()
@@ -31,43 +35,68 @@ class Gui():
             scale = possible_scale
         return scale
 
-    def _render_link(self, links: list[Link], scale: int | float,
-                     offset: int) -> None:
+    def _render_links(self, links: list[Link], scale: int | float,
+                      offset: int) -> None:
         for link in links:
             x1, y1 = link.zone1.xy
             x2, y2 = link.zone2.xy
-            nx1 = (x1 * scale) + offset
-            ny1 = (self.screen.get_height() / 2) - (y1 * scale)
-            nx2 = (x2 * scale) + offset
-            ny2 = (self.screen.get_height() / 2) - (y2 * scale)
+            mx1 = (x1 * scale) + offset
+            my1 = (self.screen.get_height() / 2) - (y1 * scale)
+            mx2 = (x2 * scale) + offset
+            my2 = (self.screen.get_height() / 2) - (y2 * scale)
             pygame.draw.line(self.screen, pygame.Color('black'),
-                             (nx1, ny1), (nx2, ny2), 3)
+                             (mx1, my1), (mx2, my2), 3)
 
-    def _render_map(self, map: list[Hub]):
-        offset = 50
-        scale = self._calc_scale(offset)
-        set_link = set([link for hub in map for link in hub.links.values()])
-        self._render_link(set_link, scale, offset)
-        for hub in map:
+    def _render_hubs(self, hubs: list[Hub], scale: int | float,
+                     offset: int) -> None:
+        for hub in hubs:
             x, y = hub.xy
-            nx = (x * scale) + offset
-            ny = (self.screen.get_height() / 2) - (y * scale)
+            mx = (x * scale) + offset
+            my = (self.screen.get_height() / 2) - (y * scale)
             pygame.draw.rect(self.screen, pygame.Color('black'),
-                             pygame.Rect(nx - 20, ny - 20, 40, 40),
+                             pygame.Rect(mx - 20, my - 20, 40, 40),
                              border_radius=10)
             pygame.draw.circle(self.screen,
                                pygame.Color(hub.color.value),
-                               (nx, ny), 21)
+                               (mx, my), 21)
             self.screen.blit(self.font.render(hub.name, True,
                                               pygame.Color('white')),
-                             (nx - 30, ny + 25))
+                             (mx - 30, my + 25))
+
+    def _render_drones(self, drones: list[Drone], scale: int | float,
+                       offset: int) -> None:
+        for drone in drones:
+            x, y = drone.coordinates
+            mx = (x * scale) + offset
+            my = (self.screen.get_height() / 2) - (y * scale)
+            points = [(mx, my + 10), (mx + 10, my),
+                      (mx, my - 10), (mx - 10, my)]
+            pygame.draw.polygon(self.screen, pygame.Color((0, 255, 255)),
+                                points)
+            txt = self.font.render(drone.name, True,
+                                   pygame.Color("black"))
+            self.screen.blit(txt, (mx-5, my-2))
+
+    def _render_map(self, map_state: Map, drones_state: list[Drone]):
+        offset = 50
+        scale = self._calc_scale(offset)
+        set_link = set([link for hub in map_state.map
+                        for link in hub.links.values()])
+        self._render_links(set_link, scale, offset)
+        self._render_hubs(map_state.map, scale, offset)
+        self._render_drones(drones_state[::-1], scale, offset)
         pygame.display.flip()
 
     def loop(self):
         t = True
         retc = False
+        can_do = False
         return_value = ''
+        turn = self.emulator.turn()
+        map_state, drones_state = self.map, self.map.start_hub.drones
+        counter = 0
         while t:
+            self.clock.tick(12)
             self.screen.fill(pygame.Color('grey40'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -88,16 +117,29 @@ class Gui():
                     if event.key == pygame.K_b:
                         t = False
                         return_value = 'b'
+                    if event.key == pygame.K_SPACE:
+                        if can_do:
+                            can_do = False
+                        else:
+                            can_do = True
 
             if retc:
                 pygame.draw.line(self.screen, THECOLORS['black'],
                                  (70, 70), (150, 150), 10)
+            if can_do:
+                counter += 1
+            if counter >= 12:
+                counter = 0
+                try:
+                    map_state, drones_state = next(turn)
+                except StopIteration:
+                    can_do = False
             self.clock.tick()
             fps = self.clock.get_fps()
             text = self.font.render(str(round(fps, 1)), True,
                                     THECOLORS['black'])
             self.screen.blit(text, (20, 20))
-            self._render_map(self.map.map)
+            self._render_map(map_state, drones_state)
 
         pygame.quit()
         return return_value

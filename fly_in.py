@@ -20,10 +20,8 @@ def bloom(path: str):
                                    create_drones=True)
     drones_manager.set_drones_route(Astar().algorithm(map))
     engine = SimulationEngine(map, drones_manager)
-    engine.turn()
     print('nb_drones:', config['nb_drones'])
-    interface = Gui(map, path.split('/', maxsplit=1)[-1])
-    print(Astar().algorithm(map))
+    interface = Gui(map, path.split('/', maxsplit=1)[-1], engine)
     return interface.loop()
 
 

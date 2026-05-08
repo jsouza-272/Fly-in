@@ -48,7 +48,7 @@ class Astar(Algorithm):
                    goal: tuple[int, int]) -> int:
         cx, cy = current
         gx, gy = goal
-        return int(math.sqrt((gx - cx)**2 + (gy - cy)**2))
+        return int(math.sqrt((gx - cx)**2 + (gy - cy)**2)) * 0
 
     @staticmethod
     def _make_path(camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
