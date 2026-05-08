@@ -7,9 +7,11 @@
 
 
 # DronesManager #
+    adicionar rota geral
 
 # Drones #
     ter um old node e um new node para calcular a coordenada do drone caso ele esteja moving
+    remover rota dos drones
 
 
 # Hub #
