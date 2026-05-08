@@ -44,9 +44,9 @@ while user_input != 'q':
     if user_input == 'b':
         if i > 0:
             i -= 1
+    if user_input == 'n':
+        i += 1
     if i == len(path_list):
         print('END')
         break
-    if user_input == 'n':
-        i += 1
     user_input = bloom(path_list[i])

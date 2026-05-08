@@ -1,5 +1,5 @@
 import pygame
-from pygame.color import THECOLORS
+from pygame import Color
 from map import Map, Hub, Link
 from drones import Drone
 from emulation import SimulationEngine
@@ -44,7 +44,7 @@ class Gui():
             my1 = (self.screen.get_height() / 2) - (y1 * scale)
             mx2 = (x2 * scale) + offset
             my2 = (self.screen.get_height() / 2) - (y2 * scale)
-            pygame.draw.line(self.screen, pygame.Color('black'),
+            pygame.draw.line(self.screen, Color('black'),
                              (mx1, my1), (mx2, my2), 3)
 
     def _render_hubs(self, hubs: list[Hub], scale: int | float,
@@ -53,14 +53,14 @@ class Gui():
             x, y = hub.xy
             mx = (x * scale) + offset
             my = (self.screen.get_height() / 2) - (y * scale)
-            pygame.draw.rect(self.screen, pygame.Color('black'),
+            pygame.draw.rect(self.screen, Color('black'),
                              pygame.Rect(mx - 20, my - 20, 40, 40),
                              border_radius=10)
             pygame.draw.circle(self.screen,
-                               pygame.Color(hub.color.value),
+                               Color(hub.color.value),
                                (mx, my), 21)
             self.screen.blit(self.font.render(hub.name, True,
-                                              pygame.Color('white')),
+                                              Color('white')),
                              (mx - 30, my + 25))
 
     def _render_drones(self, drones: list[Drone], scale: int | float,
@@ -71,10 +71,10 @@ class Gui():
             my = (self.screen.get_height() / 2) - (y * scale)
             points = [(mx, my + 10), (mx + 10, my),
                       (mx, my - 10), (mx - 10, my)]
-            pygame.draw.polygon(self.screen, pygame.Color((0, 255, 255)),
+            pygame.draw.polygon(self.screen, Color((0, 255, 255)),
                                 points)
             txt = self.font.render(drone.name, True,
-                                   pygame.Color("black"))
+                                   Color("black"))
             self.screen.blit(txt, (mx-5, my-2))
 
     def _render_map(self, map_state: Map, drones_state: list[Drone]):
@@ -95,9 +95,10 @@ class Gui():
         turn = self.emulator.turn()
         map_state, drones_state = self.map, self.map.start_hub.drones
         counter = 0
+        time_limit = 12
         while t:
             self.clock.tick(12)
-            self.screen.fill(pygame.Color('grey40'))
+            self.screen.fill(Color('grey40'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     t = False
@@ -122,13 +123,18 @@ class Gui():
                             can_do = False
                         else:
                             can_do = True
+                    if event.key == pygame.K_s:
+                        if time_limit == 12:
+                            time_limit = 0
+                        else:
+                            time_limit == 12
 
             if retc:
-                pygame.draw.line(self.screen, THECOLORS['black'],
+                pygame.draw.line(self.screen, Color('black'),
                                  (70, 70), (150, 150), 10)
             if can_do:
                 counter += 1
-            if counter >= 12:
+            if counter >= time_limit:
                 counter = 0
                 try:
                     map_state, drones_state = next(turn)
@@ -137,7 +143,7 @@ class Gui():
             self.clock.tick()
             fps = self.clock.get_fps()
             text = self.font.render(str(round(fps, 1)), True,
-                                    THECOLORS['black'])
+                                    Color('black'))
             self.screen.blit(text, (20, 20))
             self._render_map(map_state, drones_state)
 

@@ -62,8 +62,6 @@ class Hub():
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
             self.cost = inf
-        elif self.zone == Zone.RESTRICTED:
-            self.cost = 1
         else:
             self.cost = 1
 
