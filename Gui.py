@@ -94,8 +94,11 @@ class Gui():
     def _render_drones(self, drones: list[Drone], scale: int | float,
                        offset: float) -> None:
         off_x, off_y = offset
+        old_coords = set()
         for drone in drones:
             x, y = drone.coordinates
+            if (x, y) in old_coords:
+                continue
             mx = (x * scale) + off_x
             my = (y * scale) + off_y
             border = [(mx, my + 12), (mx + 12, my),
@@ -109,6 +112,8 @@ class Gui():
             txt = self.font.render(drone.name, True,
                                    Color("black"))
             self.screen.blit(txt, (mx-5, my-2))
+            old_coords.add((x, y))
+            print(old_coords)
 
     def _render_map(self, map_state: Map, drones_state: list[Drone]):
         scale, offset = self.calc_scale_and_offset(300)
@@ -116,7 +121,7 @@ class Gui():
                         for link in hub.links.values()])
         self._render_links(set_link, scale, offset)
         self._render_hubs(map_state.map, scale, offset)
-        self._render_drones(drones_state[::-1], scale, offset)
+        self._render_drones(drones_state, scale, offset)
         pygame.display.flip()
 
     def loop(self):
