@@ -31,37 +31,56 @@ class Gui():
         pygame.display.set_caption(title)
         return pygame.display.set_mode((self.width, self.height), fullscreen)
 
-    def _calc_scale(self, offset: int) -> int | float:
-        map_x, map_y = self.map.map_size
-        map_x = 1 if map_x == 0 else map_x
-        map_y = 1 if map_y == 0 else map_y
-        screen_x = self.screen.get_width() - 2*offset
-        screen_y = self.screen.get_height() - 2*offset
-        possible_scale = min(screen_x / map_x, screen_y / map_y)
-        # if possible_scale >= 70:
-        #     scale = 70
-        # else:
-        scale = possible_scale
-        return scale
+    def calc_scale_and_offset(self, padding) -> tuple[float, tuple]:
+        map_bounds = self.map.map_bounds
+        scale = self._calc_scale(padding, map_bounds)
+        offset = self._calc_offset(scale, map_bounds)
+        return scale, offset
 
-    def _render_links(self, links: list[Link], scale: int | float,
-                      offset: int) -> None:
+    def _calc_scale(self, padding: int,
+                    map_bounds: tuple) -> float:
+        max_x, max_y, min_x, min_y = map_bounds
+        map_width = max_x - min_x
+        map_height = max_y - min_y
+        if not map_width:
+            map_width = 1
+        if not map_height:
+            map_height = 1
+        scale_x = (self.width - padding*2) / map_width
+        scale_y = (self.height - padding*2) / map_height
+        return min(scale_x, scale_y)
+
+    def _calc_offset(self, scale: float,
+                     map_bounds: tuple) -> tuple[float, float]:
+        max_x, max_y, min_x, min_y = map_bounds
+        map_center_x = (max_x + min_x) / 2
+        map_center_y = (max_y + min_y) / 2
+        screen_center_x = self.width / 2
+        screen_center_y = self.height / 2
+        offset_x = screen_center_x - (map_center_x * scale)
+        offset_y = screen_center_y - (map_center_y * scale)
+        return offset_x, offset_y
+
+    def _render_links(self, links: list[Link], scale: float,
+                      offset: tuple) -> None:
+        off_x, off_y = offset
         for link in links:
             x1, y1 = link.zone1.xy
             x2, y2 = link.zone2.xy
-            mx1 = (x1 * scale) + offset
-            my1 = (self.screen.get_height() / 2) + (y1 * scale)
-            mx2 = (x2 * scale) + offset
-            my2 = (self.screen.get_height() / 2) + (y2 * scale)
+            mx1 = (x1 * scale) + off_x
+            my1 = (y1 * scale) + off_y
+            mx2 = (x2 * scale) + off_x
+            my2 = (y2 * scale) + off_y
             pygame.draw.line(self.screen, Color('black'),
                              (mx1, my1), (mx2, my2), 3)
 
     def _render_hubs(self, hubs: list[Hub], scale: int | float,
-                     offset: int) -> None:
+                     offset: tuple) -> None:
+        off_x, off_y = offset
         for hub in hubs:
             x, y = hub.xy
-            mx = (x * scale) + offset
-            my = (self.screen.get_height() / 2) + (y * scale)
+            mx = (x * scale) + off_x
+            my = (y * scale) + off_y
             pygame.draw.rect(self.screen, Color('black'),
                              pygame.Rect(mx - 20, my - 20, 40, 40),
                              border_radius=10)
@@ -73,22 +92,26 @@ class Gui():
                              (mx - 30, my + 25))
 
     def _render_drones(self, drones: list[Drone], scale: int | float,
-                       offset: int) -> None:
+                       offset: float) -> None:
+        off_x, off_y = offset
         for drone in drones:
             x, y = drone.coordinates
-            mx = (x * scale) + offset
-            my = (self.screen.get_height() / 2) + (y * scale)
+            mx = (x * scale) + off_x
+            my = (y * scale) + off_y
+            border = [(mx, my + 12), (mx + 12, my),
+                      (mx, my - 12), (mx - 12, my)]
             points = [(mx, my + 10), (mx + 10, my),
                       (mx, my - 10), (mx - 10, my)]
-            pygame.draw.polygon(self.screen, Color((0, 255, 255)),
+            pygame.draw.polygon(self.screen, Color('gray30'),
+                                border)
+            pygame.draw.polygon(self.screen, Color('gray50'),
                                 points)
             txt = self.font.render(drone.name, True,
                                    Color("black"))
             self.screen.blit(txt, (mx-5, my-2))
 
     def _render_map(self, map_state: Map, drones_state: list[Drone]):
-        offset = 50
-        scale = self._calc_scale(offset)
+        scale, offset = self.calc_scale_and_offset(300)
         set_link = set([link for hub in map_state.map
                         for link in hub.links.values()])
         self._render_links(set_link, scale, offset)
@@ -107,7 +130,7 @@ class Gui():
         time_limit = 12
         while t:
             self.clock.tick(12)
-            self.screen.fill(Color('grey40'))
+            self.screen.fill(Color('gray80'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     t = False
