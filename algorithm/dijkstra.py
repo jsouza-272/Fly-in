@@ -5,7 +5,7 @@ from .algorithm import Algorithm
 import math
 
 
-class Astar(Algorithm):
+class Dijkstra(Algorithm):
     def algorithm(self, graph: Map, rejected: list[Hub] = [],
                   start_hub: Hub | None = None,
                   end_hub: Hub | None = None) -> list[Hub]:

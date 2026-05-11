@@ -1,5 +1,5 @@
 from .algorithm import Algorithm
-from .Astar import Astar
+from .dijkstra import Dijkstra
 
 
-__all__ = ['Astar', 'Algorithm']
+__all__ = ['Dijkstra', 'Algorithm']

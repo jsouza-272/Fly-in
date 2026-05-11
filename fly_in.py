@@ -2,7 +2,7 @@ import sys
 from parser import Parser
 from map import Map
 from drones import DronesManager
-from algorithm import Astar
+from algorithm import Dijkstra
 from emulation import SimulationEngine
 import os
 from Gui import Gui
@@ -18,7 +18,7 @@ def bloom(path: str):
     map = Map(**config)
     drones_manager = DronesManager(config['nb_drones'], map.start_hub,
                                    create_drones=True)
-    drones_manager.set_drones_route(Astar().algorithm(map))
+    drones_manager.set_drones_route(Dijkstra().algorithm(map))
     engine = SimulationEngine(map, drones_manager)
     print('nb_drones:', config['nb_drones'])
     interface = Gui(map, path.split('/', maxsplit=1)[-1], engine)

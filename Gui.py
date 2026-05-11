@@ -8,9 +8,15 @@ from emulation import SimulationEngine
 class Gui():
     def __init__(self, map: Map, title: str,
                  emulator: SimulationEngine,
-                 width: int = 1280, height: int = 720,):
-        self.width = width
-        self.height = height
+                 w_h: tuple[int, int] = (-1, -1)):
+        pygame.init()
+        w, h = w_h
+        if w == -1 and h == -1:
+            self.width = pygame.display.Info().current_w
+            self.height = pygame.display.Info().current_h
+        else:
+            self.width = w
+            self.height = h
         self.map = map
         self.emulator = emulator
         self.screen = self._start(title)
@@ -18,9 +24,12 @@ class Gui():
         self.clock = pygame.time.Clock()
 
     def _start(self, title: str) -> pygame.Surface:
-        pygame.init()
+        fullscreen = 0
+        if (self.height == pygame.display.Info().current_h
+            and self.width == pygame.display.Info().current_w):
+            fullscreen = pygame.FULLSCREEN
         pygame.display.set_caption(title)
-        return pygame.display.set_mode((self.width, self.height))
+        return pygame.display.set_mode((self.width, self.height), fullscreen)
 
     def _calc_scale(self, offset: int) -> int | float:
         map_x, map_y = self.map.map_size
@@ -29,10 +38,10 @@ class Gui():
         screen_x = self.screen.get_width() - 2*offset
         screen_y = self.screen.get_height() - 2*offset
         possible_scale = min(screen_x / map_x, screen_y / map_y)
-        if possible_scale >= 70:
-            scale = 70
-        else:
-            scale = possible_scale
+        # if possible_scale >= 70:
+        #     scale = 70
+        # else:
+        scale = possible_scale
         return scale
 
     def _render_links(self, links: list[Link], scale: int | float,
@@ -41,9 +50,9 @@ class Gui():
             x1, y1 = link.zone1.xy
             x2, y2 = link.zone2.xy
             mx1 = (x1 * scale) + offset
-            my1 = (self.screen.get_height() / 2) - (y1 * scale)
+            my1 = (self.screen.get_height() / 2) + (y1 * scale)
             mx2 = (x2 * scale) + offset
-            my2 = (self.screen.get_height() / 2) - (y2 * scale)
+            my2 = (self.screen.get_height() / 2) + (y2 * scale)
             pygame.draw.line(self.screen, Color('black'),
                              (mx1, my1), (mx2, my2), 3)
 
@@ -52,7 +61,7 @@ class Gui():
         for hub in hubs:
             x, y = hub.xy
             mx = (x * scale) + offset
-            my = (self.screen.get_height() / 2) - (y * scale)
+            my = (self.screen.get_height() / 2) + (y * scale)
             pygame.draw.rect(self.screen, Color('black'),
                              pygame.Rect(mx - 20, my - 20, 40, 40),
                              border_radius=10)
@@ -68,7 +77,7 @@ class Gui():
         for drone in drones:
             x, y = drone.coordinates
             mx = (x * scale) + offset
-            my = (self.screen.get_height() / 2) - (y * scale)
+            my = (self.screen.get_height() / 2) + (y * scale)
             points = [(mx, my + 10), (mx + 10, my),
                       (mx, my - 10), (mx - 10, my)]
             pygame.draw.polygon(self.screen, Color((0, 255, 255)),
