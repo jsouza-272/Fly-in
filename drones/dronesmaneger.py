@@ -44,7 +44,7 @@ class DronesManager():
         for drone in self.__drones:
             drone.route = route.copy()
 
-    def move_drone(self, drone: Drone, try_recalc_route: bool = True) -> str:
+    def move_drone(self, drone: Drone) -> str:
         drone_move_info = None
         msg = ''
         if isinstance(drone, Drone) and len(drone.route) > 0:
