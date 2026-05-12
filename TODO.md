@@ -29,11 +29,7 @@
 
 
 # GUI #
-    usar circulos/quadrados (ver oque fica melhor) para os hub
-    usar linhas para as connections
-    pensar em como fazer os drones se moverem (talves somar 0.2 se nao for restricted e 0.1 se for)
-    fazer ficar bom
-
+    mostar os movimentos por turno na tela
 
 # Geral #
     refatorar TUDO
