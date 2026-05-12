@@ -7,10 +7,8 @@
 
 
 # DronesManager #
-    adicionar rota geral
 
 # Drones #
-    remover rota dos drones
 
 
 # Hub #
