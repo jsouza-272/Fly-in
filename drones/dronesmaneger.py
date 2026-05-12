@@ -5,8 +5,11 @@ from map import Hub
 class DronesManager():
     def __init__(self, nb_drones: int = 0,
                  start_drone_position: Hub | None = None,
-                 name_patern: str = 'D', create_drones: bool = False) -> None:
+                 name_patern: str = 'D', create_drones: bool = False,
+                 route: list[Hub] = []) -> None:
         self.__drones: list[Drone] = []
+        self.__route = None
+        self.route = route
         if create_drones:
             if not start_drone_position:
                 raise TypeError('if create_drones is True, '
@@ -21,12 +24,24 @@ class DronesManager():
         return self.__drones
 
     @property
+    def route(self) -> list[Hub]:
+        return self.__route
+
+    @route.setter
+    def route(self, new_route: list[Hub]) -> None:
+        if (isinstance(new_route, list)
+                and all(isinstance(_, Hub) for _ in new_route)):
+            self.__route = new_route
+        else:
+            raise TypeError('route must be a list of Hub objects')
+
+    @property
     def moving_drones(self) -> list[Drone]:
         return [d for d in self.drones if d.moving]
 
     @property
     def end_drones(self) -> list[Drone]:
-        return [d for d in self.__drones if len(d.route) == 0]
+        return [d for d in self.__drones if d.node == self.route[0]]
 
     def create_drones(self, nb_drones: int, start_drone_position: Hub,
                       name_patern: str = 'D') -> None:
@@ -35,23 +50,14 @@ class DronesManager():
                               for n in range(nb_drones)])
         start_drone_position.drones.extend(self.__drones)
 
-    def set_drones_route(self, route: list[Hub]) -> None:
-        if (not isinstance(route, list)
-                or not all(isinstance(_, Hub) for _ in route)):
-            raise TypeError('route must be a list of Hub objects')
-        if not route:
-            raise ValueError('route must not be empty')
-        for drone in self.__drones:
-            drone.route = route.copy()
-
     def move_drone(self, drone: Drone) -> str:
-        drone_move_info = None
         msg = ''
-        if isinstance(drone, Drone) and len(drone.route) > 0:
-            node = drone.route[-1]
+        if isinstance(drone, Drone) and drone.node != self.route[0]:
+            if drone.node:
+                drone_index = self.route.index(drone.node)
+            else:
+                drone_index = self.route.index(drone.old_node)
+            node = self.route[drone_index-1]
             link = node.links.get((node, drone.node))
-            drone_move_info = drone.move(node, link)
-            msg = drone_move_info[0]
-            if drone_move_info[1] and drone_move_info[1] in drone.route:
-                drone.route.remove(drone_move_info[1])
+            msg = drone.move(node, link)
         return msg

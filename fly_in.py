@@ -18,7 +18,7 @@ def bloom(path: str):
     map = Map(**config)
     drones_manager = DronesManager(config['nb_drones'], map.start_hub,
                                    create_drones=True)
-    drones_manager.set_drones_route(Dijkstra().algorithm(map))
+    drones_manager.route = Dijkstra().algorithm(map)
     engine = SimulationEngine(map, drones_manager)
     print('nb_drones:', config['nb_drones'])
     interface = Gui(map, path.split('/', maxsplit=1)[-1], engine)

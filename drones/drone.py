@@ -1,6 +1,5 @@
 from map import Hub
 from map import Link
-from errors import DroneRunningError
 
 
 class Drone():
@@ -8,7 +7,7 @@ class Drone():
         self.__name = name
         self.__coordinates = node.xy if node else None
         self.__node = node
-        self.__route = []
+        self.__old_node = None
         self.__moving = False
 
     def __repr__(self):
@@ -17,6 +16,10 @@ class Drone():
     @property
     def name(self) -> str:
         return self.__name
+
+    @property
+    def old_node(self) -> Hub:
+        return self.__old_node
 
     @property
     def node(self) -> Hub:
@@ -36,23 +39,6 @@ class Drone():
             raise TypeError('invalid drone node type')
 
     @property
-    def route(self) -> list[Hub]:
-        return self.__route
-
-    @route.setter
-    def route(self, new_route: list[Hub]) -> None:
-        if (isinstance(new_route, list)
-                and all(isinstance(_, Hub) for _ in new_route)):
-            if self.node and not self.moving and self.node in new_route:
-                self.__route = new_route[:new_route.index(self.node)]
-            elif not self.node and self.moving:
-                raise DroneRunningError("cant change route")
-            else:
-                raise ValueError('Invalid route')
-        else:
-            raise TypeError('route must be a list of Hub objects')
-
-    @property
     def coordinates(self) -> tuple[int, int]:
         return self.__coordinates
 
@@ -68,21 +54,17 @@ class Drone():
     def moving(self) -> bool:
         return self.__moving
 
-    def move(self, to_node: Hub, link_to_use: Link) -> tuple[str, None | Hub]:
+    def move(self, to_node: Hub, link_to_use: Link) -> str:
         msg = ''
-        node_to_remove = None
         if not isinstance(to_node, Hub):
             raise TypeError('invalid node \"to_node\"', to_node)
         if not link_to_use and not self.__moving:
             raise TypeError(self, 'Link not exist', self.node, to_node)
-        if to_node not in self.route:
-            raise TypeError(to_node, 'not in route')
         if to_node.blocked:
             raise TypeError('PANIC')
         if self.moving:
             to_node.reserved = False
             self.__moving = False
-            node_to_remove = to_node
             self.node = to_node
             to_node.drones.append(self)
             msg = f'{self}-{to_node} '
@@ -92,13 +74,13 @@ class Drone():
                 self.node.drones.remove(self)
                 link_to_use.use()
                 self.__moving = True
+                self.__old_node = self.node
                 self.node = to_node
         elif to_node.free() and link_to_use.can_use():
             if not to_node.restricted:
                 self.node.drones.remove(self)
                 link_to_use.use()
                 to_node.drones.append(self)
-                node_to_remove = to_node
                 self.node = to_node
                 msg = f'{self}-{to_node} '
-        return msg, node_to_remove
+        return msg
