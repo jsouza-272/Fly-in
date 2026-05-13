@@ -4,6 +4,7 @@ from pygame.font import Font
 from map import Map, Hub, Link
 from drones import Drone
 from emulation import SimulationEngine
+from VisualDrone import VisualDrone
 
 
 class Gui():
@@ -19,6 +20,7 @@ class Gui():
             self.width = w
             self.height = h
         self.map = map
+        self.visual_drones: dict[Drone, VisualDrone] = {}
         self.emulator = emulator
         self.screen = self._start(title)
         self.clock = pygame.time.Clock()
@@ -90,14 +92,15 @@ class Gui():
             self.screen.blit(font.render(hub.name, True, Color('black')),
                              (mx + (circle_size * 0.2), my + circle_size))
 
-    def _render_drones(self, drones: list[Drone], scale: float,
-                       offset: float, font: Font) -> None:
+    def _render_drones(self, drones: list[Drone],
+                       scale: float, offset: float, font: Font) -> bool:
+        can_do_next_turn = False
         off_x, off_y = offset
-        old_coords = set()
         for drone in drones:
-            x, y = drone.coordinates
-            if (x, y) in old_coords:
-                continue
+            target = drone.coordinates
+            visual_drone = self.visual_drones[drone.name]
+            visual_drone.update(pygame.Vector2(target))
+            x, y = visual_drone.pos
             mx = (x * scale) + off_x
             my = (y * scale) + off_y
             size = int(scale * 0.05)
@@ -112,19 +115,23 @@ class Gui():
             txt = font.render(drone.name, True,
                               Color("black"))
             self.screen.blit(txt, (mx - scale * 0.02,
-                                   my - scale * 0.01))
-            old_coords.add((x, y))
+                             my - scale * 0.01))
+        if all([drone.coordinates == self.visual_drones[drone.name].pos
+               for drone in drones]):
+            can_do_next_turn = True
+        return can_do_next_turn
 
-    def _render_map(self, map_state: Map, drones_state: list[Drone]):
+    def _render_map(self, map_state: Map, drones_state: list[Drone]) -> bool:
         scale, offset = self._calc_scale_and_offset(400)
         set_link = set([link for hub in map_state.map
                         for link in hub.links.values()])
         self._render_links(set_link, scale, offset)
         self._render_hubs(map_state.map, scale,
                           offset, Font(None, int(scale * 0.12)))
-        self._render_drones(drones_state, scale,
-                            offset, Font(None, int(scale * 0.07)))
+        can_do_next_turn = self._render_drones(drones_state, scale, offset,
+                                               Font(None, int(scale * 0.07)))
         pygame.display.flip()
+        return can_do_next_turn
 
     def loop(self):
         t = True
@@ -132,12 +139,13 @@ class Gui():
         return_value = ''
         turn = self.emulator.turn()
         map_state, drones_state = self.map, self.map.start_hub.drones
-        counter = 0
-        time_limit = 10
+        self.visual_drones = {drone.name: VisualDrone(drone)
+                              for drone in drones_state}
+        do_next_turn = False
         font = Font(None, 20)
         turn_counter = 0
         while t:
-            self.clock.tick(12)
+            self.clock.tick(30)
             self.screen.fill(Color('gray80'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -158,15 +166,7 @@ class Gui():
                             can_do = False
                         else:
                             can_do = True
-                    if event.key == pygame.K_s:
-                        if time_limit == 10:
-                            time_limit = 0
-                        else:
-                            time_limit == 12
-            if can_do:
-                counter += 1
-            if counter >= time_limit:
-                counter = 0
+            if do_next_turn and can_do:
                 try:
                     map_state, drones_state = next(turn)
                     turn_counter += 1
@@ -174,7 +174,7 @@ class Gui():
                     can_do = False
             text = font.render(str(turn_counter), True, Color('black'))
             self.screen.blit(text, (50, 50))
-            self._render_map(map_state, drones_state)
+            do_next_turn = self._render_map(map_state, drones_state)
 
         pygame.quit()
         return return_value
