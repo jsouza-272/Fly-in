@@ -19,6 +19,9 @@ class Parser():
         config.update(self.check_hub(self.lines))
         config.update(self.check_end_hub(self.lines))
         config.update(self.check_conections(self.lines))
+        n = config['end_hub'].get('metadata').get('max_drones')
+        if n and n < config['nb_drones']:
+            raise ParserError('test')
         return config
 
     def check_lines(self, lines: list[str]) -> None:

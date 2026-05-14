@@ -10,6 +10,9 @@ from Gui import Gui
 
 def bloom(path: str):
     try:
+        if len(sys.argv) < 2:
+            raise SyntaxError('Usage: python3 fly_in.py <map_path.txt>')
+        # path = sys.argv[1]
         parsing = Parser(path)
         config = parsing.parsing()
     except Exception as e:
