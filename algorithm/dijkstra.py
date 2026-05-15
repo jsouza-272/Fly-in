@@ -2,7 +2,6 @@ from map.hub import Hub
 from map.map import Map
 from errors import CantSolveGraphError
 from .algorithm import Algorithm
-import math
 
 
 class Dijkstra(Algorithm):

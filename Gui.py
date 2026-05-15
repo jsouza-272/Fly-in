@@ -65,7 +65,7 @@ class Gui():
         return offset_x, offset_y
 
     def _render_links(self, links: list[Link], scale: float,
-                      offset: tuple, font: Font) -> None:
+                      offset: tuple) -> None:
         off_x, off_y = offset
         size = int(3 * (scale * 0.01))
         for link in links:
@@ -77,10 +77,6 @@ class Gui():
             my2 = (y2 * scale) + off_y
             pygame.draw.line(self.screen, Color('black'),
                              (mx1, my1), (mx2, my2), size)
-            text = font.render(f"{link.usage}/{link.max_link_capacity}",
-                               True, Color('white'))
-            self.screen.blit(text, ((mx1 + mx2) / 2, (my1 + my2) / 2))
-            
 
     def _render_hubs(self, hubs: list[Hub], scale: float,
                      offset: tuple, font: Font) -> None:
@@ -91,19 +87,16 @@ class Gui():
             x, y = hub.xy
             mx = (x * scale) + off_x
             my = (y * scale) + off_y
-            if hub.color.value == 'rainbow':
+            if hub.color == 'rainbow':
                 pygame.draw.circle(self.screen,
                                    Color(random.choice(list(pygame.color.THECOLORS))),
                                (mx, my), circle_size)
             else:
                 pygame.draw.circle(self.screen,
-                               Color(hub.color.value),
+                               Color(hub.color),
                                (mx, my), circle_size)
             self.screen.blit(font.render(hub.name, True, Color('black')),
                              (mx + (circle_size * 0.2), my + circle_size))
-            self.screen.blit(font.render(f"{len(hub.drones)}/{hub.max_drones}",
-                                         True, Color('white')),
-                             (mx + (circle_size * 0.5), my - (circle_size * 2)))
 
     def _render_drones(self, drones: list[Drone],
                        scale: float, offset: float, font: Font) -> bool:
@@ -134,12 +127,12 @@ class Gui():
             can_do_next_turn = True
         return can_do_next_turn
 
-    def _render_map(self, map_state: Map, drones_state: list[Drone]) -> bool:
+    def _render_map(self, map_state: list[Hub], drones_state: list[Drone]) -> bool:
         scale, offset = self._calc_scale_and_offset(300)
-        set_link = set([link for hub in map_state.map
+        set_link = set([link for hub in map_state
                         for link in hub.links.values()])
-        self._render_links(set_link, scale, offset, Font(None, int(scale * 0.12)))
-        self._render_hubs(map_state.map, scale,
+        self._render_links(set_link, scale, offset)
+        self._render_hubs(map_state, scale,
                           offset, Font(None, int(scale * 0.12)))
         can_do_next_turn = self._render_drones(drones_state, scale, offset,
                                                Font(None, int(scale * 0.07)))
@@ -151,13 +144,15 @@ class Gui():
         can_do = False
         return_value = ''
         turn = self.emulator.turn()
-        map_state, drones_state = self.map, self.map.start_hub.drones
+        index = 0
+        map_state, drones_state = turn[index]
         self.visual_drones = {drone.name: VisualDrone(drone)
                               for drone in drones_state}
         do_next_turn = False
-        font = Font(None, 20)
+        font = Font(None, 30)
         turn_counter = 0
         drone_speed = 0.1
+        limit = len(turn)
         while t:
             self.clock.tick(30)
             self.screen.fill(Color('gray80'))
@@ -188,17 +183,30 @@ class Gui():
                         t = False
                     if event.key == pygame.K_F11:
                         pygame.display.toggle_fullscreen()
+                    if event.key == pygame.K_LEFT:
+                        if index > 0:
+                            can_do = False
+                            index -= 1
+                            map_state, drones_state = turn[index]
+                            turn_counter -= 1
+                    if event.key == pygame.K_RIGHT:
+                        if index < limit - 1:
+                            can_do = False
+                            index += 1
+                            map_state, drones_state = turn[index]
+                            turn_counter += 1
             if do_next_turn and can_do:
                 try:
-                    map_state, drones_state = next(turn)
+                    index += 1
+                    if index == limit:
+                        raise StopIteration
+                    map_state, drones_state = turn[index]
                     turn_counter += 1
                 except StopIteration:
                     can_do = False
+                    index -= 1
             text = font.render(str(turn_counter), True, Color('black'))
             self.screen.blit(text, (50, 50))
-            _fps = self.clock.get_fps()
-            txt = font.render(str(round(_fps, 1)), True, Color('black'))
-            self.screen.blit(txt, (300, 50))
             do_next_turn = self._render_map(map_state, drones_state)
 
         pygame.quit()

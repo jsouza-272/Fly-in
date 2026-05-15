@@ -1,5 +1,4 @@
 from zones import Zone
-from colors import Colors
 from typing import TYPE_CHECKING
 from math import inf
 
@@ -47,21 +46,19 @@ class Hub():
             self.max_drones = nb_drones
         for key, value in metadata.items():
             if key == 'color':
-                for c in Colors:
-                    if c.value == value:
-                        self.color = c
-                        break
+                self.color = value
             elif key == 'zone':
-                for z in Zone:
-                    if z.value == value:
-                        self.zone = z
-                        break
+                self.zone = Zone(value)
             else:
                 self.max_drones = value
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
             self.cost = inf
+        elif self.zone == Zone.RESTRICTED:
+            self.cost = 2
+        elif self.zone == Zone.PRIORITY:
+            self.cost = 0
         else:
             self.cost = 1
 
