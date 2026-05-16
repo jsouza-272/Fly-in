@@ -32,12 +32,12 @@ class Gui():
 
     def _start(self, title: str) -> pygame.Surface:
         """Creates and returns the main pygame surface."""
-        # fullscreen = 0
-        # if (self.height == pygame.display.Info().current_h
-        #        and self.width == pygame.display.Info().current_w):
-        #    fullscreen = pygame.FULLSCREEN
+        fullscreen = 0
+        if (self.height == pygame.display.Info().current_h
+                and self.width == pygame.display.Info().current_w):
+            fullscreen = pygame.FULLSCREEN
         pygame.display.set_caption(title)
-        return pygame.display.set_mode((self.width, self.height), 0)
+        return pygame.display.set_mode((self.width, self.height), fullscreen)
 
     def _calc_scale_and_offset(self, padding: int) -> tuple[float, tuple]:
         """Calculates scale and offset to center the map on screen."""
