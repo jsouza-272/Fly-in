@@ -4,8 +4,11 @@ from abc import ABC, abstractmethod
 
 
 class Algorithm(ABC):
+    """Interface base para algoritmos de roteamento."""
+
     @abstractmethod
     def algorithm(self, graph: Map, rejected: list[Hub] = [],
                   start_hub: Hub | None = None,
                   end_hub: Hub | None = None) -> list[Hub]:
+        """Calcula e retorna uma rota entre hubs."""
         pass

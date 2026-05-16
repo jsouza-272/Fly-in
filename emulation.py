@@ -5,13 +5,17 @@ import time
 
 
 class SimulationEngine():
+    """Controla a execução dos turnos da simulação."""
+
     def __init__(self, map: Map, drones_manager: DronesManager):
+        """Inicializa referências de mapa e gerenciador de drones."""
         self.__drones = drones_manager.drones
         self.__drones_manager = drones_manager
         self.__graph = map.map
         self.__map = map
 
     def turn(self) -> list[tuple]:
+        """Executa turnos até todos drones chegarem ao destino ou timeout."""
         start = time.time()
         turn_counter = 0
         drones = self.__drones

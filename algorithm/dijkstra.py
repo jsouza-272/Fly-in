@@ -5,9 +5,12 @@ from .algorithm import Algorithm
 
 
 class Dijkstra(Algorithm):
+    """Implementação do algoritmo de Dijkstra para o mapa."""
+
     def algorithm(self, graph: Map, rejected: list[Hub] = [],
                   start_hub: Hub | None = None,
                   end_hub: Hub | None = None) -> list[Hub]:
+        """Calcula o caminho de menor custo entre início e fim."""
         end_hub = graph.end_hub if not end_hub else end_hub
         start_hub = graph.start_hub if not start_hub else start_hub
         open_set = {start_hub}
@@ -41,6 +44,7 @@ class Dijkstra(Algorithm):
 
     @staticmethod
     def _make_path(camefrom: dict, goal: Hub, start: Hub) -> list[Hub]:
+        """Reconstrói caminho final usando o mapa de predecessores."""
         path = [goal]
         current = goal
         while True:
