@@ -11,14 +11,14 @@ class Parser():
         res = map_path.split('.', maxsplit=1)
         if res[1] != 'txt':
             raise ParserError(f"Invalid file extension, got: \"{res[1]}\""
-                                f", expected: \"txt\"")
+                              f", expected: \"txt\"")
         with open(map_path) as lines:
             self.lines = lines.read().splitlines()
-        self.names = set()
-        self.coordinates = set()
+        self.names: set[str] = set()
+        self.coordinates: set[tuple] = set()
 
-    def parsing(self):
-        config = {}
+    def parsing(self) -> dict[str, Any]:
+        config: dict[str, Any] = {}
         self.check_lines(self.lines)
         config.update(self.check_first_line(self.lines))
         config.update(self.check_start_hub(self.lines, config['nb_drones']))
@@ -54,9 +54,10 @@ be start with nb_drones: <positive_integer>')
                 raise ParserError(f'Line {self.find_line(line)}: invalid \
 value for nb_drones, expected a positive integer')
 
-    def check_start_hub(self, lines: list[str], nb_drones: int) -> dict[str, Any]:
+    def check_start_hub(self, lines: list[str],
+                        nb_drones: int) -> dict[str, Any]:
         ctrl = False
-        start_hub = {'start_hub': {}}
+        start_hub: dict[str, dict] = {'start_hub': {}}
         try:
             for line in lines:
                 if line.startswith('start_hub'):
@@ -66,7 +67,7 @@ many start_hub')
                     else:
                         ctrl = True
                         if line.split()[1].isdigit():
-                            raise ParserError(f'start_hub need name')
+                            raise ParserError('start_hub need name')
                         start_hub['start_hub'].update({'name':
                                                        self.check_hub_name(
                                                            line)})
@@ -84,8 +85,9 @@ many start_hub')
                                                   'be blocked')
                             max_drones = metadata['metadata'].get('max_drones')
                             if max_drones and max_drones < nb_drones:
-                                raise ParserError('The max_drones value for start_hub'
-                                                  ' cannot be less than nb_drones')
+                                raise ParserError('The max_drones value for '
+                                                  'start_hub cannot be less '
+                                                  'than nb_drones')
                             start_hub['start_hub'].update(metadata)
                         except IndexError:
                             pass
@@ -101,9 +103,10 @@ missing informations')
             raise ParserError(f'Line {self.find_line(line)}: {e}')
         return start_hub
 
-    def check_end_hub(self, lines: list[str], nb_drones: int) -> dict[str, Any]:
+    def check_end_hub(self, lines: list[str],
+                      nb_drones: int) -> dict[str, Any]:
         ctrl = False
-        end_hub = {'end_hub': {}}
+        end_hub: dict[str, dict] = {'end_hub': {}}
         try:
             for line in lines:
                 if line.startswith('end_hub'):
@@ -113,7 +116,7 @@ many end_hub')
                     else:
                         ctrl = True
                         if line.split()[1].isdigit():
-                            raise ParserError(f'end_hub need name')
+                            raise ParserError('end_hub need name')
                         end_hub['end_hub'].update({'name':
                                                    self.check_hub_name(line)})
                         end_hub['end_hub'].update({'x': int(
@@ -130,8 +133,9 @@ many end_hub')
                                                   'be blocked')
                             max_drones = metadata['metadata'].get('max_drones')
                             if max_drones and max_drones < nb_drones:
-                                raise ParserError('The max_drones value for end_hub'
-                                                  ' cannot be less than nb_drones')
+                                raise ParserError('The max_drones value for '
+                                                  'end_hub cannot be less than'
+                                                  ' nb_drones')
                             end_hub['end_hub'].update(metadata)
                         except IndexError:
                             pass
@@ -148,13 +152,13 @@ missing informations')
         return end_hub
 
     def check_hub(self, lines: list[str]) -> dict:
-        hubs = {'hub': []}
+        hubs: dict[str, list] = {'hub': []}
         try:
             for line in lines:
                 if line.startswith('hub:'):
-                    hub = {}
+                    hub: dict[str, Any] = {}
                     if line.split()[1].isdigit():
-                        raise ParserError(f'hub need name')
+                        raise ParserError('hub need name')
                     hub.update({'name':
                                 self.check_hub_name(line)})
                     hub.update({'x': int(line.split()[2])})
@@ -181,7 +185,7 @@ missing informations')
     def check_hub_metadata(self, hub: dict[str, Any]) -> dict[str, Any]:
         metadata = hub.get('metadata')
         if not metadata:
-            return
+            return {}
         if any(_ not in metadata for _ in '[=]'):
             raise ParserError("invalid syntax use [<metadata_type>=<value>] \
 for metadata")
@@ -197,9 +201,10 @@ for metadata")
                 if not split_m[1]:
                     raise IndexError()
                 if split_m[0] in ('color', 'max_drones', 'zone'):
-                    if (split_m[1] in ZONES or split_m[1]
-                        in THECOLORS or (split_m[0] == 'max_drones'
-                                         and int(split_m[1]) > 0)):
+                    if (split_m[1] in ZONES or (split_m[1]
+                        in THECOLORS or split_m[1] == 'rainbow')
+                        or (split_m[0] == 'max_drones'
+                            and int(split_m[1]) > 0)):
 
                         meta[split_m[0]] = (int(split_m[1])
                                             if split_m[0] == 'max_drones'
@@ -209,8 +214,9 @@ for metadata")
                                 ZONES):
                             raise ParserError("Invalid zone. Valid zones "
                                               "are: ", ZONES)
-                        if (split_m[0] == 'color' and split_m[1] not in
-                                THECOLORS):
+                        if (split_m[0] == 'color' and
+                            (split_m[1] not in THECOLORS
+                             and split_m[1] != 'rainbow')):
                             raise ParserError(f"Invalid color: '{split_m[1]}' "
                                               "not exist")
                         if split_m[0] == 'max_drones' and int(split_m[1]) < 1:
@@ -232,17 +238,17 @@ Expected [<metadata_type>=<value>]")
                 split_line = split_line[0:split_line.index(_)]
                 break
         if len(split_line) > 1 or '-' in split_line[0]:
-            raise ParserError(f'Invalid name')
+            raise ParserError('Invalid name')
         if split_line[0] in self.names:
             raise ParserError(f'duplicate name "{split_line[0]}"')
         self.names.add(split_line[0])
         return split_line[0]
 
     def check_conections(self, lines: list[str]) -> dict[str, list]:
-        connections = {'connections': []}
+        connections: dict[str, list] = {'connections': []}
         crtl_list = []
         for line in lines:
-            connection = {}
+            connection: dict[str, Any] = {}
             if line.startswith('connection:'):
                 splited_line = line.split()
                 if len(splited_line) < 2:
@@ -287,13 +293,13 @@ for metadata')
         dup = {metadata.count('max_link_capacity=') > 1: 'max_link_capacity'}
         if True in dup:
             raise ParserError(f'Duplicate metadata field "{dup[True]}"')
-        metadata = metadata.strip('[]').split('=')
-        if metadata[0] != 'max_link_capacity':
+        s_metadata = metadata.strip('[]').split('=')
+        if s_metadata[0] != 'max_link_capacity':
             raise ParserError('invalid metadata')
-        if int(metadata[1]) < 1:
+        if int(s_metadata[1]) < 1:
             raise ParserError('max_link_capacity value \
 must be greater than 0')
-        return {metadata[0]: int(metadata[1])}
+        return {s_metadata[0]: int(s_metadata[1])}
 
     def check_coordinates(self, x: int, y: int) -> None:
         if (x, y) in self.coordinates:

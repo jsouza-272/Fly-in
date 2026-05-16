@@ -1,6 +1,7 @@
 from map import Map
 from drones import DronesManager
 from copy import deepcopy
+import time
 
 
 class SimulationEngine():
@@ -10,7 +11,8 @@ class SimulationEngine():
         self.__graph = map.map
         self.__map = map
 
-    def turn(self):
+    def turn(self) -> list[tuple]:
+        start = time.time()
         turn_counter = 0
         drones = self.__drones
         d_manager = self.__drones_manager
@@ -23,6 +25,9 @@ class SimulationEngine():
                 turn_msg += d_manager.move_drone(drone)
             print(turn_msg)
             self.__map.reset_links()
+            if time.time() - start >= 1:
+                print('time out')
+                break
         turns.append((deepcopy(self.__graph), deepcopy(self.__drones)))
         print(turn_counter)
         return turns

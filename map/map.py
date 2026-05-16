@@ -19,7 +19,7 @@ class Map():
         return self.__end_hub
 
     @property
-    def map_bounds(self) -> tuple[int, int]:
+    def map_bounds(self) -> tuple[float, float, float, float]:
         max_x = max(self.map, key=lambda hub: hub.xy[0]).xy[0]
         max_y = max(self.map, key=lambda hub: hub.xy[1]).xy[1]
         min_x = min(self.map, key=lambda hub: hub.xy[0]).xy[0]

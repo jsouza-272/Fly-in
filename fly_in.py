@@ -8,7 +8,7 @@ import os
 from Gui import Gui
 
 
-def main():
+def main() -> str:
     try:
         if len(sys.argv) < 2:
             raise SyntaxError('Usage: python3 fly_in.py <map_path.txt>')
@@ -28,7 +28,7 @@ def main():
     return interface.loop()
 
 
-def bloom(path: str):
+def bloom(path: str) -> str:
     try:
         parsing = Parser(path)
         config = parsing.parsing()
@@ -46,7 +46,6 @@ def bloom(path: str):
 
 
 debug = '--debug' in sys.argv
-    
 user_input = ""
 i = 0
 path_list = [

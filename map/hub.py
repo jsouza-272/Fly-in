@@ -1,9 +1,10 @@
+from __future__ import annotations
 from zones import Zone
 from typing import TYPE_CHECKING
-from math import inf
 
 if TYPE_CHECKING:
     from .map import Link
+    from drones import Drone
 
 
 class Hub():
@@ -11,12 +12,12 @@ class Hub():
                  y: int, metadata: dict | None = None,
                  nb_drones: int | None = None):
         self.name = name
-        self.xy = (x, y)
+        self.xy = (float(x), float(y))
         self.color = None
         self.zone = Zone.NORMAL
         self.max_drones = 1
-        self.drones = []
-        self.links: dict[str, 'Link'] = {}
+        self.drones: list['Drone'] = []
+        self.links: dict[tuple, 'Link'] = {}
         self.__reserved = False
         if metadata:
             self.set_metadata(metadata, nb_drones)
@@ -54,7 +55,7 @@ class Hub():
 
     def set_cost(self) -> None:
         if self.zone == Zone.BLOCKED:
-            self.cost = inf
+            self.cost = 99999
         elif self.zone == Zone.RESTRICTED:
             self.cost = 2
         elif self.zone == Zone.PRIORITY:
@@ -62,7 +63,7 @@ class Hub():
         else:
             self.cost = 1
 
-    def get_link(self, next: 'Hub') -> 'Link':
+    def get_link(self, next: 'Hub') -> Link | None:
         return self.links.get((self, next))
 
     def free(self) -> bool:

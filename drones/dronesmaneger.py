@@ -8,7 +8,7 @@ class DronesManager():
                  name_patern: str = 'D', create_drones: bool = False,
                  route: list[Hub] = []) -> None:
         self.__drones: list[Drone] = []
-        self.__route = None
+        self.__route: list[Hub] | None = None
         self.route = route
         if create_drones:
             if not start_drone_position:
@@ -24,7 +24,7 @@ class DronesManager():
         return self.__drones
 
     @property
-    def route(self) -> list[Hub]:
+    def route(self) -> list[Hub] | None:
         return self.__route
 
     @route.setter
@@ -41,7 +41,8 @@ class DronesManager():
 
     @property
     def end_drones(self) -> list[Drone]:
-        return [d for d in self.__drones if d.node == self.route[0]]
+        return [d for d in self.__drones if self.route
+                and d.node == self.route[0]]
 
     def create_drones(self, nb_drones: int, start_drone_position: Hub,
                       name_patern: str = 'D') -> None:
@@ -52,10 +53,11 @@ class DronesManager():
 
     def move_drone(self, drone: Drone) -> str:
         msg = ''
-        if isinstance(drone, Drone) and drone.node != self.route[0]:
+        if (isinstance(drone, Drone) and self.route
+                and drone.node != self.route[0]):
             if drone.node:
                 drone_index = self.route.index(drone.node)
-            else:
+            elif drone.old_node:
                 drone_index = self.route.index(drone.old_node)
             node = self.route[drone_index-1]
             link = node.links.get((node, drone.node))

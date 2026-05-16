@@ -12,7 +12,7 @@ class Link():
         if metadata:
             self.set_metadata(metadata)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{self.zone1}<->{self.zone2}"
 
     def set_metadata(self, metadata: dict[str, Any]) -> None:
@@ -31,14 +31,14 @@ class Link():
             return self.zone1
         if self.zone2 == current:
             return self.zone2
-        return
+        return None
 
     def get_next_hub(self, current: Hub) -> Hub | None:
         if self.zone1 == current:
             return self.zone2
         if self.zone2 == current:
             return self.zone1
-        return
+        return None
 
     def reset_usage(self) -> None:
         self.usage = 0

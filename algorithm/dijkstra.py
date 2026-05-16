@@ -21,12 +21,13 @@ class Dijkstra(Algorithm):
                          for n in currend_node.links.values()
                          if n.get_next_hub(currend_node) not in close_set]
             for n in neighbors:
-                if n not in open_set and not n.blocked:
+                if n and n not in open_set and not n.blocked:
                     open_set.add(n)
                     gscore[n] = gscore[currend_node] + n.cost
                     camefrom[n] = currend_node
 
-                elif n in gscore and gscore[currend_node] + n.cost < gscore[n]:
+                elif (n and n in gscore and
+                      gscore[currend_node] + n.cost < gscore[n]):
                     gscore[n] = gscore[currend_node] + n.cost
                     camefrom[n] = currend_node
 

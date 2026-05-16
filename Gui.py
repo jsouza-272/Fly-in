@@ -6,6 +6,7 @@ from drones import Drone
 from emulation import SimulationEngine
 from VisualDrone import VisualDrone
 import random
+from typing import Any
 
 
 class Gui():
@@ -21,27 +22,27 @@ class Gui():
             self.width = w
             self.height = h
         self.map = map
-        self.visual_drones: dict[Drone, VisualDrone] = {}
+        self.visual_drones: dict[str, VisualDrone] = {}
         self.emulator = emulator
         self.screen = self._start(title)
         self.clock = pygame.time.Clock()
 
     def _start(self, title: str) -> pygame.Surface:
-        fullscreen = 0
-        if (self.height == pygame.display.Info().current_h
-                and self.width == pygame.display.Info().current_w):
-            fullscreen = pygame.FULLSCREEN
+        # fullscreen = 0
+        # if (self.height == pygame.display.Info().current_h
+        #        and self.width == pygame.display.Info().current_w):
+        #    fullscreen = pygame.FULLSCREEN
         pygame.display.set_caption(title)
-        return pygame.display.set_mode((self.width, self.height), fullscreen)
+        return pygame.display.set_mode((self.width, self.height), 0)
 
-    def _calc_scale_and_offset(self, padding) -> tuple[float, tuple]:
+    def _calc_scale_and_offset(self, padding: int) -> tuple[float, tuple]:
         map_bounds = self.map.map_bounds
         scale = self._calc_scale(padding, map_bounds)
         offset = self._calc_offset(scale, map_bounds)
         return scale, offset
 
     def _calc_scale(self, padding: int,
-                    map_bounds: tuple) -> float:
+                    map_bounds: tuple) -> Any | float:
         max_x, max_y, min_x, min_y = map_bounds
         map_width = max_x - min_x
         map_height = max_y - min_y
@@ -64,7 +65,7 @@ class Gui():
         offset_y = screen_center_y - (map_center_y * scale)
         return offset_x, offset_y
 
-    def _render_links(self, links: list[Link], scale: float,
+    def _render_links(self, links: set[Link], scale: float,
                       offset: tuple) -> None:
         off_x, off_y = offset
         size = int(3 * (scale * 0.01))
@@ -89,17 +90,20 @@ class Gui():
             my = (y * scale) + off_y
             if hub.color == 'rainbow':
                 pygame.draw.circle(self.screen,
-                                   Color(random.choice(list(pygame.color.THECOLORS))),
-                               (mx, my), circle_size)
+                                   Color(random.choice(
+                                        list(pygame.color.THECOLORS))),
+                                   (mx, my), circle_size)
             else:
                 pygame.draw.circle(self.screen,
-                               Color(hub.color),
-                               (mx, my), circle_size)
+                                   Color(hub.color if hub.color
+                                         else random.Random(1).choice(
+                                             list(pygame.color.THECOLORS))),
+                                   (mx, my), circle_size)
             self.screen.blit(font.render(hub.name, True, Color('black')),
                              (mx + (circle_size * 0.2), my + circle_size))
 
     def _render_drones(self, drones: list[Drone],
-                       scale: float, offset: float, font: Font) -> bool:
+                       scale: float, offset: tuple, font: Font) -> bool:
         can_do_next_turn = False
         off_x, off_y = offset
         for drone in drones:
@@ -127,7 +131,8 @@ class Gui():
             can_do_next_turn = True
         return can_do_next_turn
 
-    def _render_map(self, map_state: list[Hub], drones_state: list[Drone]) -> bool:
+    def _render_map(self, map_state: list[Hub],
+                    drones_state: list[Drone]) -> bool:
         scale, offset = self._calc_scale_and_offset(300)
         set_link = set([link for hub in map_state
                         for link in hub.links.values()])
@@ -139,7 +144,7 @@ class Gui():
         pygame.display.flip()
         return can_do_next_turn
 
-    def loop(self):
+    def loop(self) -> str:
         t = True
         can_do = False
         return_value = ''
@@ -171,6 +176,9 @@ class Gui():
                     if event.key == pygame.K_n:
                         t = False
                         return_value = 'n'
+                    if event.key == pygame.K_b:
+                        t = False
+                        return_value = 'b'
                     if event.key == pygame.K_ESCAPE:
                         t = False
                         return_value = 'q'
