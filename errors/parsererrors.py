@@ -1,4 +1,4 @@
 class ParserError(Exception):
-    """Erro base para problemas de parsing de mapa."""
+    """Base error for map parsing problems."""
 
     pass

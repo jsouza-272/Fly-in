@@ -8,12 +8,12 @@ if TYPE_CHECKING:
 
 
 class Hub():
-    """Representa um hub com metadados, links e drones presentes."""
+    """Represents a hub with metadata, links, and resident drones."""
 
     def __init__(self, name: str, x: int,
                  y: int, metadata: dict | None = None,
                  nb_drones: int | None = None):
-        """Inicializa dados básicos do hub e aplica metadados opcionais."""
+        """Initializes basic hub data and applies optional metadata."""
         self.name = name
         self.xy = (float(x), float(y))
         self.color = None
@@ -29,17 +29,17 @@ class Hub():
         self.set_cost()
 
     def __repr__(self) -> str:
-        """Retorna o nome do hub como representação textual."""
+        """Returns the hub name as its string representation."""
         return self.name
 
     @property
     def reserved(self) -> bool:
-        """Indica se o hub está reservado por um drone em trânsito."""
+        """Indicates whether the hub is reserved by a moving drone."""
         return self.__reserved
 
     @reserved.setter
     def reserved(self, reserve: bool) -> None:
-        """Atualiza estado de reserva com validações de consistência."""
+        """Updates reservation state with consistency checks."""
         if self.__reserved and reserve:
             raise ValueError('fail')
         elif not reserve and not self.__reserved:
@@ -49,7 +49,7 @@ class Hub():
 
     def set_metadata(self, metadata: dict,
                      nb_drones: int | None) -> None:
-        """Aplica metadados de cor, zona e capacidade ao hub."""
+        """Applies color, zone, and capacity metadata to the hub."""
         if not metadata.get('max_drones') and nb_drones:
             self.max_drones = nb_drones
         for key, value in metadata.items():
@@ -61,7 +61,7 @@ class Hub():
                 self.max_drones = value
 
     def set_cost(self) -> None:
-        """Define o custo de travessia conforme a zona do hub."""
+        """Sets traversal cost according to hub zone."""
         if self.zone == Zone.BLOCKED:
             self.cost = 99999
         elif self.zone == Zone.RESTRICTED:
@@ -72,17 +72,17 @@ class Hub():
             self.cost = 1
 
     def get_link(self, next: 'Hub') -> Link | None:
-        """Obtém o link que conecta este hub ao próximo."""
+        """Gets the link connecting this hub to the next one."""
         return self.links.get((self, next))
 
     def free(self) -> bool:
-        """Informa se o hub possui capacidade para mais drones."""
+        """Reports whether the hub has capacity for more drones."""
         if self.__reserved:
             return len(self.drones) + 1 < self.max_drones
         else:
             return len(self.drones) < self.max_drones
 
     def reset_links(self) -> None:
-        """Reseta o uso de todos os links conectados ao hub."""
+        """Resets usage on all links connected to the hub."""
         for link in self.links.values():
             link.reset_usage()

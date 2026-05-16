@@ -10,12 +10,12 @@ from typing import Any
 
 
 class Gui():
-    """Renderiza o mapa e os drones durante a simulação."""
+    """Renders the map and drones during the simulation."""
 
     def __init__(self, map: Map, title: str,
                  emulator: SimulationEngine,
                  w_h: tuple[int, int] = (-1, -1)):
-        """Inicializa janela, estado visual e referências da simulação."""
+        """Initializes window, visual state, and simulation references."""
         pygame.init()
         w, h = w_h
         if w == -1 and h == -1:
@@ -31,7 +31,7 @@ class Gui():
         self.clock = pygame.time.Clock()
 
     def _start(self, title: str) -> pygame.Surface:
-        """Cria e retorna a superfície principal do pygame."""
+        """Creates and returns the main pygame surface."""
         # fullscreen = 0
         # if (self.height == pygame.display.Info().current_h
         #        and self.width == pygame.display.Info().current_w):
@@ -40,7 +40,7 @@ class Gui():
         return pygame.display.set_mode((self.width, self.height), 0)
 
     def _calc_scale_and_offset(self, padding: int) -> tuple[float, tuple]:
-        """Calcula escala e deslocamento para centralizar o mapa na tela."""
+        """Calculates scale and offset to center the map on screen."""
         map_bounds = self.map.map_bounds
         scale = self._calc_scale(padding, map_bounds)
         offset = self._calc_offset(scale, map_bounds)
@@ -48,7 +48,7 @@ class Gui():
 
     def _calc_scale(self, padding: int,
                     map_bounds: tuple) -> Any | float:
-        """Calcula fator de escala do mapa com base no tamanho da tela."""
+        """Calculates map scale factor based on screen size."""
         max_x, max_y, min_x, min_y = map_bounds
         map_width = max_x - min_x
         map_height = max_y - min_y
@@ -62,7 +62,7 @@ class Gui():
 
     def _calc_offset(self, scale: float,
                      map_bounds: tuple) -> tuple[float, float]:
-        """Calcula deslocamento para posicionar o centro do mapa na tela."""
+        """Calculates offset to place the map center on screen."""
         max_x, max_y, min_x, min_y = map_bounds
         map_center_x = (max_x + min_x) / 2
         map_center_y = (max_y + min_y) / 2
@@ -74,7 +74,7 @@ class Gui():
 
     def _render_links(self, links: set[Link], scale: float,
                       offset: tuple) -> None:
-        """Desenha as conexões entre hubs."""
+        """Draws connections between hubs."""
         off_x, off_y = offset
         size = int(3 * (scale * 0.01))
         for link in links:
@@ -89,7 +89,7 @@ class Gui():
 
     def _render_hubs(self, hubs: list[Hub], scale: float,
                      offset: tuple, font: Font) -> None:
-        """Desenha hubs e seus nomes no mapa."""
+        """Draws hubs and their names on the map."""
         off_x, off_y = offset
         hub_size = max(10, min(60, scale * 0.1))
         circle_size = int(hub_size)
@@ -113,7 +113,7 @@ class Gui():
 
     def _render_drones(self, drones: list[Drone],
                        scale: float, offset: tuple, font: Font) -> bool:
-        """Atualiza e desenha drones, retornando se pode avançar o turno."""
+        """Updates and draws drones, returning whether the turn can advance."""
         can_do_next_turn = False
         off_x, off_y = offset
         for drone in drones:
@@ -143,7 +143,7 @@ class Gui():
 
     def _render_map(self, map_state: list[Hub],
                     drones_state: list[Drone]) -> bool:
-        """Renderiza o estado atual do mapa e dos drones."""
+        """Renders the current state of the map and drones."""
         scale, offset = self._calc_scale_and_offset(300)
         set_link = set([link for hub in map_state
                         for link in hub.links.values()])
@@ -156,7 +156,7 @@ class Gui():
         return can_do_next_turn
 
     def loop(self) -> str:
-        """Executa o loop principal da interface até encerrar a execução."""
+        """Runs the main UI loop until execution ends."""
         t = True
         can_do = False
         return_value = ''

@@ -3,11 +3,11 @@ from .link import Link
 
 
 class Map():
-    """Agrupa hubs e conexões, expondo utilitários do grafo."""
+    """Groups hubs and connections, exposing graph utilities."""
 
     def __init__(self, nb_drones: int, connections: list[dict],
                  start_hub: dict, end_hub: dict, hub: list[dict] = []):
-        """Constrói o mapa a partir da configuração de entrada."""
+        """Builds the map from input configuration."""
         self.map = self.build_map(hub, start_hub, end_hub,
                                   connections, nb_drones)
         self.__start_hub = self.map[0]
@@ -15,17 +15,17 @@ class Map():
 
     @property
     def start_hub(self) -> Hub:
-        """Retorna o hub inicial do mapa."""
+        """Returns the map start hub."""
         return self.__start_hub
 
     @property
     def end_hub(self) -> Hub:
-        """Retorna o hub final do mapa."""
+        """Returns the map end hub."""
         return self.__end_hub
 
     @property
     def map_bounds(self) -> tuple[float, float, float, float]:
-        """Calcula limites máximos e mínimos das coordenadas do mapa."""
+        """Calculates max and min bounds of map coordinates."""
         max_x = max(self.map, key=lambda hub: hub.xy[0]).xy[0]
         max_y = max(self.map, key=lambda hub: hub.xy[1]).xy[1]
         min_x = min(self.map, key=lambda hub: hub.xy[0]).xy[0]
@@ -35,7 +35,7 @@ class Map():
     def build_map(self, hub: list[dict], start_hub: dict,
                   end_hub: dict, connections: list[dict],
                   nb_drones: int) -> list[Hub]:
-        """Cria hubs e links do mapa a partir de dados de configuração."""
+        """Creates map hubs and links from configuration data."""
         map = [Hub(**start_hub, nb_drones=nb_drones),
                Hub(**end_hub, nb_drones=nb_drones)]
         map.extend([Hub(**h) for h in hub])
@@ -54,6 +54,6 @@ class Map():
         return map
 
     def reset_links(self) -> None:
-        """Reseta uso de links em todos os hubs do mapa."""
+        """Resets link usage for all hubs in the map."""
         for hub in self.map:
             hub.reset_links()

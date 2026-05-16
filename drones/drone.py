@@ -3,10 +3,10 @@ from map import Link
 
 
 class Drone():
-    """Representa um drone e seu estado de movimentação no mapa."""
+    """Represents a drone and its movement state on the map."""
 
     def __init__(self, name: str, node: Hub | None):
-        """Inicializa nome, posição inicial e estado de movimento."""
+        """Initializes name, starting position, and movement state."""
         self.__name = name
         self.__coordinates = node.xy if node else (0, 0)
         self.__node = node
@@ -14,27 +14,27 @@ class Drone():
         self.__moving = False
 
     def __repr__(self) -> str:
-        """Retorna representação textual do drone."""
+        """Returns the string representation of the drone."""
         return self.__name
 
     @property
     def name(self) -> str:
-        """Retorna o nome do drone."""
+        """Returns the drone name."""
         return self.__name
 
     @property
     def old_node(self) -> Hub | None:
-        """Retorna o último hub conhecido antes do movimento."""
+        """Returns the previous known hub before movement."""
         return self.__old_node
 
     @property
     def node(self) -> Hub | None:
-        """Retorna o hub atual do drone, se houver."""
+        """Returns the drone current hub, if available."""
         return self.__node
 
     @node.setter
     def node(self, new_node: Hub) -> None:
-        """Atualiza o hub atual e ajusta coordenadas conforme estado."""
+        """Updates current hub and adjusts coordinates based on state."""
         if isinstance(new_node, Hub) and not self.__moving:
             self.__node = new_node
             self.coordinates = new_node.xy
@@ -48,12 +48,12 @@ class Drone():
 
     @property
     def coordinates(self) -> tuple[float, float]:
-        """Retorna as coordenadas atuais do drone."""
+        """Returns the current coordinates of the drone."""
         return self.__coordinates
 
     @coordinates.setter
     def coordinates(self, new_coordinate: tuple[float, float]) -> None:
-        """Atualiza coordenadas do drone após validação de tipo."""
+        """Updates drone coordinates after type validation."""
         if (len(new_coordinate) == 2 and isinstance(new_coordinate, tuple)
                 and all(isinstance(_, (int, float)) for _ in new_coordinate)):
             self.__coordinates = new_coordinate
@@ -62,11 +62,11 @@ class Drone():
 
     @property
     def moving(self) -> bool:
-        """Indica se o drone está em deslocamento entre hubs."""
+        """Indicates whether the drone is moving between hubs."""
         return self.__moving
 
     def move(self, to_node: Hub, link_to_use: Link | None) -> str:
-        """Executa uma tentativa de movimento para o hub de destino."""
+        """Attempts to move the drone to the destination hub."""
         msg = ''
         if not isinstance(to_node, Hub):
             raise TypeError('invalid node \"to_node\"', to_node)

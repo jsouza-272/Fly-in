@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Zone(Enum):
-    """Tipos de zona suportados para hubs no mapa."""
+    """Supported zone types for hubs on the map."""
 
     NORMAL = 'normal'
     BLOCKED = 'blocked'

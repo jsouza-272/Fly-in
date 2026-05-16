@@ -1,10 +1,10 @@
 class DroneError():
-    """Erro base relacionado ao domínio de drones."""
+    """Base error related to the drone domain."""
 
     pass
 
 
 class DroneRunningError(DroneError):
-    """Erro para inconsistências durante execução de drones."""
+    """Error for inconsistencies during drone execution."""
 
     pass

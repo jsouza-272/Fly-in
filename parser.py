@@ -7,10 +7,10 @@ ZONES = {'normal', 'blocked', 'restricted', 'priority'}
 
 
 class Parser():
-    """Valida e converte arquivo de mapa para estrutura de configuração."""
+    """Validates and converts a map file into configuration data."""
 
     def __init__(self, map_path: str):
-        """Carrega linhas do mapa e inicializa controles internos."""
+        """Loads map lines and initializes internal controls."""
         res = map_path.split('.', maxsplit=1)
         if res[1] != 'txt':
             raise ParserError(f"Invalid file extension, got: \"{res[1]}\""
@@ -21,7 +21,7 @@ class Parser():
         self.coordinates: set[tuple] = set()
 
     def parsing(self) -> dict[str, Any]:
-        """Executa validações e retorna configuração consolidada do mapa."""
+        """Runs validations and returns consolidated map configuration."""
         config: dict[str, Any] = {}
         self.check_lines(self.lines)
         config.update(self.check_first_line(self.lines))
@@ -32,7 +32,7 @@ class Parser():
         return config
 
     def check_lines(self, lines: list[str]) -> None:
-        """Valida prefixos permitidos e remove comentários inline."""
+        """Validates allowed prefixes and strips inline comments."""
         valid = ('#', 'nb_drones', 'start_hub', 'hub', 'end_hub',
                  'connection')
         for line in lines:
@@ -42,7 +42,7 @@ class Parser():
                 lines[lines.index(line)] = line.split('#')[0]
 
     def check_first_line(self, lines: list[str]) -> dict[str, int]:
-        """Valida e extrai a quantidade de drones da primeira linha útil."""
+        """Validates and extracts drone count from first relevant line."""
         for line in lines:
             if line and not line.startswith('#'):
                 break
@@ -62,7 +62,7 @@ value for nb_drones, expected a positive integer')
 
     def check_start_hub(self, lines: list[str],
                         nb_drones: int) -> dict[str, Any]:
-        """Valida e retorna a configuração do hub inicial."""
+        """Validates and returns start hub configuration."""
         ctrl = False
         start_hub: dict[str, dict] = {'start_hub': {}}
         try:
@@ -112,7 +112,7 @@ missing informations')
 
     def check_end_hub(self, lines: list[str],
                       nb_drones: int) -> dict[str, Any]:
-        """Valida e retorna a configuração do hub final."""
+        """Validates and returns end hub configuration."""
         ctrl = False
         end_hub: dict[str, dict] = {'end_hub': {}}
         try:
@@ -160,7 +160,7 @@ missing informations')
         return end_hub
 
     def check_hub(self, lines: list[str]) -> dict:
-        """Valida e retorna a lista de hubs intermediários."""
+        """Validates and returns the list of intermediate hubs."""
         hubs: dict[str, list] = {'hub': []}
         try:
             for line in lines:
@@ -192,7 +192,7 @@ missing informations')
         return {}
 
     def check_hub_metadata(self, hub: dict[str, Any]) -> dict[str, Any]:
-        """Valida metadados de hubs e converte valores para tipos esperados."""
+        """Validates hub metadata and converts values to expected types."""
         metadata = hub.get('metadata')
         if not metadata:
             return {}
@@ -242,7 +242,7 @@ Expected [<metadata_type>=<value>]")
         return {'metadata': meta}
 
     def check_hub_name(self, line: str) -> str:
-        """Valida nome do hub e garante unicidade."""
+        """Validates hub name and ensures uniqueness."""
         split_line = line.split()[1:]
         for _ in split_line:
             if _.isdigit():
@@ -256,7 +256,7 @@ Expected [<metadata_type>=<value>]")
         return split_line[0]
 
     def check_conections(self, lines: list[str]) -> dict[str, list]:
-        """Valida conexões entre hubs e seus metadados opcionais."""
+        """Validates hub connections and their optional metadata."""
         connections: dict[str, list] = {'connections': []}
         crtl_list = []
         for line in lines:
@@ -299,7 +299,7 @@ max_link_capacity must be a valid integer')
         return connections
 
     def check_connection_metadata(self, metadata: str) -> dict[str, Any]:
-        """Valida metadados de conexão e retorna capacidade máxima."""
+        """Validates connection metadata and returns maximum capacity."""
         if any(_ not in metadata for _ in '[=]'):
             raise ParserError('invalid syntax use [<metadata_type>=<value>] \
 for metadata')
@@ -315,11 +315,11 @@ must be greater than 0')
         return {s_metadata[0]: int(s_metadata[1])}
 
     def check_coordinates(self, x: int, y: int) -> None:
-        """Garante que coordenadas não sejam reutilizadas."""
+        """Ensures coordinates are not reused."""
         if (x, y) in self.coordinates:
             raise ParserError("Coordinates already exist")
         self.coordinates.add((x, y))
 
     def find_line(self, line: str) -> int:
-        """Retorna o número da linha original no arquivo de entrada."""
+        """Returns the original line number in the input file."""
         return self.lines.index(line) + 1

@@ -1,10 +1,10 @@
 class AlgorithmError(Exception):
-    """Erro base para falhas em algoritmos de rota."""
+    """Base error for route algorithm failures."""
 
     pass
 
 
 class CantSolveGraphError(AlgorithmError):
-    """Erro quando não é possível encontrar caminho no grafo."""
+    """Error raised when no path can be found in the graph."""
 
     pass
