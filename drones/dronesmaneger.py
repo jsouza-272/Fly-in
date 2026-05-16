@@ -3,10 +3,13 @@ from map import Hub
 
 
 class DronesManager():
+    """Manages the drone collection and route-based movement."""
+
     def __init__(self, nb_drones: int = 0,
                  start_drone_position: Hub | None = None,
                  name_patern: str = 'D', create_drones: bool = False,
                  route: list[Hub] = []) -> None:
+        """Initializes the manager and optionally creates initial drones."""
         self.__drones: list[Drone] = []
         self.__route: list[Hub] | None = None
         self.route = route
@@ -21,14 +24,17 @@ class DronesManager():
 
     @property
     def drones(self) -> list[Drone]:
+        """Returns the list of managed drones."""
         return self.__drones
 
     @property
     def route(self) -> list[Hub] | None:
+        """Returns the current route used by drones."""
         return self.__route
 
     @route.setter
     def route(self, new_route: list[Hub]) -> None:
+        """Sets the drone route after type validation."""
         if (isinstance(new_route, list)
                 and all(isinstance(_, Hub) for _ in new_route)):
             self.__route = new_route
@@ -37,21 +43,25 @@ class DronesManager():
 
     @property
     def moving_drones(self) -> list[Drone]:
+        """Returns only drones currently moving."""
         return [d for d in self.drones if d.moving]
 
     @property
     def end_drones(self) -> list[Drone]:
+        """Returns drones that already reached the route final hub."""
         return [d for d in self.__drones if self.route
                 and d.node == self.route[0]]
 
     def create_drones(self, nb_drones: int, start_drone_position: Hub,
                       name_patern: str = 'D') -> None:
+        """Creates drones at the initial hub using the given name pattern."""
         self.__drones.extend([Drone(name_patern + str(n + 1),
                                     start_drone_position)
                               for n in range(nb_drones)])
         start_drone_position.drones.extend(self.__drones)
 
     def move_drone(self, drone: Drone) -> str:
+        """Advances one drone by one route step and returns move message."""
         msg = ''
         if (isinstance(drone, Drone) and self.route
                 and drone.node != self.route[0]):
