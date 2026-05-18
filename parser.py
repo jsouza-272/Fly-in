@@ -1,3 +1,5 @@
+"""Map file parser and validator for Fly-in configuration input."""
+
 from errors import ParserError
 from typing import Any
 from pygame.color import THECOLORS

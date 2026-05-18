@@ -1,3 +1,5 @@
+"""Simulation turn engine for drone movement over the map graph."""
+
 from map import Map, Hub
 from drones import DronesManager, Drone
 from copy import deepcopy

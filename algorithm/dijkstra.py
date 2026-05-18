@@ -1,3 +1,5 @@
+"""Dijkstra pathfinding implementation for Fly-in map graphs."""
+
 from map.hub import Hub
 from map.map import Map
 from errors import CantSolveGraphError

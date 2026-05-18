@@ -1,3 +1,5 @@
+"""Drone domain model and movement state transitions."""
+
 from map import Hub
 from map import Link
 

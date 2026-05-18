@@ -1,3 +1,5 @@
+"""Hub domain model with capacity, metadata, and link management."""
+
 from __future__ import annotations
 from zones import Zone
 from typing import TYPE_CHECKING

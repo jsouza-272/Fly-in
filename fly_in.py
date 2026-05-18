@@ -1,3 +1,5 @@
+"""Application entry point for loading maps and running the simulation UI."""
+
 import sys
 from parser import Parser
 from map import Map
@@ -9,6 +11,7 @@ from Gui import Gui
 
 
 def main(debug: bool, path: str) -> str:
+    """Loads configuration and starts the GUI simulation loop."""
     try:
         if len(sys.argv) < 2:
             raise SyntaxError('Usage: python3 fly_in.py <map_path.txt>')
