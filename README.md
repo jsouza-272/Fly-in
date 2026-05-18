@@ -103,6 +103,24 @@ The implementation follows a layered object-oriented design:
 - **Pathfinding layer**: `algorithm/dijkstra.py` computes a weighted route using destination-zone cost and reconstructs the final path via predecessor mapping.
 - **Simulation layer**: `emulation.py` advances turns, applies movement decisions, enforces capacity limits, and records state snapshots for replay.
 
+### How pathfinding works in this project
+
+The route is computed with a Dijkstra-style search centered on hub costs:
+
+1. Start from `start_hub` with accumulated cost `0`.
+2. Keep two sets:
+   - **open_set**: hubs to evaluate next.
+   - **close_set** (closed set): already-evaluated hubs (plus any explicitly rejected hubs).
+3. Repeatedly select the hub with the smallest known accumulated cost.
+4. Expand its neighbors through existing links, skipping blocked or closed hubs.
+5. For each valid neighbor, compute a new candidate cost (`current_cost + neighbor.cost`):
+   - if the neighbor is new, record this cost and predecessor;
+   - if it was seen before with a higher cost, update cost and predecessor.
+6. Stop when `end_hub` is selected, then rebuild the path by walking predecessors backward from end to start.
+7. If no route reaches the end hub, raise `CantSolveGraphError`.
+
+Because costs are attached to hubs (not links), the algorithm naturally models zone penalties (such as restricted hubs) while still finding the lowest total route under map constraints.
+
 This strategy separates responsibilities so input validation, routing, simulation, and rendering remain maintainable and testable.
 
 ## Visual Representation
