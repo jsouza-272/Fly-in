@@ -1,3 +1,5 @@
+"""Abstract routing algorithm contract used by pathfinders."""
+
 from map.hub import Hub
 from map.map import Map
 from abc import ABC, abstractmethod

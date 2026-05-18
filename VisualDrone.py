@@ -1,3 +1,5 @@
+"""Visual interpolation utilities for drone movement rendering."""
+
 from drones import Drone
 from pygame import Vector2
 

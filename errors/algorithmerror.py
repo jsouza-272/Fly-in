@@ -1,3 +1,5 @@
+"""Algorithm-related exception hierarchy definitions."""
+
 class AlgorithmError(Exception):
     """Base error for route algorithm failures."""
 

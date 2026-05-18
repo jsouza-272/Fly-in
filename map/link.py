@@ -1,3 +1,5 @@
+"""Link domain model representing traversable hub connections."""
+
 from .hub import Hub
 from typing import Any
 

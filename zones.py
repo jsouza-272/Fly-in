@@ -1,3 +1,5 @@
+"""Zone definitions used to classify hubs on the map."""
+
 from enum import Enum
 
 

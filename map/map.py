@@ -1,3 +1,5 @@
+"""Map graph construction and traversal utility helpers."""
+
 from .hub import Hub
 from .link import Link
 

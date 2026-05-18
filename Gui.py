@@ -1,3 +1,5 @@
+"""Graphical interface responsible for rendering map and drone states."""
+
 import pygame
 from pygame import Color
 from pygame.font import Font

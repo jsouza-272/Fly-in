@@ -1,3 +1,5 @@
+"""Drone manager responsible for route-based movement orchestration."""
+
 from .drone import Drone
 from map import Hub
 
