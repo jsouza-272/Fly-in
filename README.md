@@ -104,3 +104,9 @@ errors/            # custom exception types
 ```bash
 make lint   # runs flake8 + mypy
 ```
+
+## AI Usage
+
+AI was used as a support tool throughout this project. It helped clarify the project requirements, assisted with the graphical part when learning how to use Pygame, and supported debugging for some mypy and Makefile issues. It was also used to improve and organize parts of the documentation.  
+
+All AI-generated suggestions were reviewed, adapted, and validated before being kept in the project.
