@@ -4,7 +4,7 @@
 
 ## Description
 
-Fly-in is a drone-routing simulation built in Python. Given a map file describing hubs, connections, and zone constraints, it finds an optimal path from a start hub to an end hub and simulates a fleet of drones moving through that network under turn and capacity constraints.
+Fly-in is a drone-routing simulation built in Python. Given a map file describing hubs, connections, and zone constraints, it finds the optimal weighted path from a start hub to an end hub and simulates a fleet of drones moving through that network under turn and capacity constraints.
 
 ## Features
 
