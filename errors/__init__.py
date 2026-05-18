@@ -6,5 +6,4 @@ from .parsererrors import ParserError
 
 
 __all__ = ['CantSolveGraphError', 'AlgorithmError',
-           'DroneRunningError', 'RecalculateRoute',
-           'ParserError']
+           'DroneRunningError', 'ParserError']

@@ -14,11 +14,16 @@ class Parser():
     def __init__(self, map_path: str):
         """Loads map lines and initializes internal controls."""
         res = map_path.split('.', maxsplit=1)
+        if len(res) < 2:
+            raise ParserError("Map file must have a \".txt\" extension")
         if res[1] != 'txt':
             raise ParserError(f"Invalid file extension, got: \"{res[1]}\""
                               f", expected: \"txt\"")
-        with open(map_path) as lines:
-            self.lines = lines.read().splitlines()
+        try:
+            with open(map_path) as lines:
+                self.lines = lines.read().splitlines()
+        except FileNotFoundError:
+            raise ParserError(f'Map file "{map_path}" does not exist')
         self.names: set[str] = set()
         self.coordinates: set[tuple] = set()
 
