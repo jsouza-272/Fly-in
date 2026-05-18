@@ -30,6 +30,8 @@ This creates a `.venv` virtual environment and installs all dependencies via `uv
 python3 fly_in.py <map_path.txt>
 # or using make (defaults to maps/challenger/01_the_impossible_dream.txt)
 make run
+# run a specific map via make
+make run MAP=maps/easy/01_linear_path.txt
 # step through all built-in maps for visual testing
 python3 fly_in.py --debug
 ```
@@ -38,9 +40,14 @@ python3 fly_in.py --debug
 
 | Key | Action |
 |-----|--------|
-| `→` / `Space` | Next turn |
+| `→` | Next turn |
 | `←` | Previous turn |
-| `q` | Quit / return to map selector |
+| `Space` | Play / Pause |
+| `s` | Speed up / slow down |
+| `r` | Reload current map (only while paused) |
+| `Esc` | Quit / return to map selector |
+| `n` (debug) | Next map |
+| `b` (debug) | Previous map |
 
 ## Map File Format
 
