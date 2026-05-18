@@ -26,6 +26,8 @@ class Hub():
         self.__reserved = False
         if metadata:
             self.set_metadata(metadata, nb_drones)
+        elif nb_drones:
+            self.max_drones = nb_drones
         self.blocked = True if self.zone == Zone.BLOCKED else False
         self.restricted = True if self.zone == Zone.RESTRICTED else False
         self.set_cost()

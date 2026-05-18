@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by Joao Souza*
+*This project has been created as part of the 42 curriculum by Jsouza*
 
 # Fly-in
 

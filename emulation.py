@@ -3,7 +3,6 @@
 from map import Map, Hub
 from drones import DronesManager, Drone
 from copy import deepcopy
-import time
 
 
 class SimulationEngine():
@@ -17,8 +16,7 @@ class SimulationEngine():
         self.__map = map
 
     def turn(self) -> list[tuple[list[Hub], list[Drone]]]:
-        """Runs turns until all drones arrive or timeout is reached."""
-        start = time.time()
+        """Runs turns until all drones arrive."""
         turn_counter = 0
         drones = self.__drones
         d_manager = self.__drones_manager
@@ -31,9 +29,6 @@ class SimulationEngine():
                 turn_msg += d_manager.move_drone(drone)
             print(turn_msg)
             self.__map.reset_links()
-            if time.time() - start >= 1:
-                print('time out')
-                break
         turns.append((deepcopy(self.__graph), deepcopy(self.__drones)))
         print(turn_counter)
         return turns
