@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by jsouza-272*
+*This project has been created as part of the 42 curriculum by Joao Souza*
 
 # Fly-in
 
@@ -9,7 +9,7 @@ Fly-in is a drone-routing simulation built in Python. Given a map file describin
 ## Features
 
 - **Map parser** — validates `.txt` map files with hubs, connections, zones (`normal`, `blocked`, `restricted`, `priority`), colors, and capacity constraints.
-- **Dijkstra pathfinding** — computes a weighted route through the hub graph while excluding blocked zones.
+- **Dijkstra pathfinding** — computes the lowest-cost weighted route through the hub graph while excluding blocked zones.
 - **Simulation engine** — steps the drone fleet turn by turn, respecting per-link and per-hub capacity limits.
 - **Pygame GUI** — renders the map, route, and drone positions interactively.
 
