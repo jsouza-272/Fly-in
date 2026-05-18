@@ -110,7 +110,7 @@ The route is computed with a Dijkstra-style search centered on hub costs:
 1. Start from `start_hub` with accumulated cost `0`.
 2. Keep two sets:
    - **open_set**: hubs to evaluate next.
-   - **close_set**: already-evaluated hubs (plus any explicitly rejected hubs).
+   - **close_set** (closed set): already-evaluated hubs (plus any explicitly rejected hubs).
 3. Repeatedly select the hub with the smallest known accumulated cost.
 4. Expand its neighbors through existing links, skipping blocked or closed hubs.
 5. For each valid neighbor, compute a new candidate cost (`current_cost + neighbor.cost`):
