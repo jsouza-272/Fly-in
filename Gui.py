@@ -155,9 +155,9 @@ class Gui():
         pygame.display.flip()
         return can_do_next_turn
 
-    def loop(self) -> str:
+    def loop(self, debug: bool) -> str:
         """Runs the main UI loop until execution ends."""
-        t = True
+        display = True
         can_do = False
         return_value = ''
         turn = self.emulator.turn()
@@ -170,12 +170,12 @@ class Gui():
         turn_counter = 0
         drone_speed = 0.1
         limit = len(turn)
-        while t:
+        while display:
             self.clock.tick(30)
             self.screen.fill(Color('gray80'))
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    t = False
+                    display = False
                     return_value = 'q'
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_s:
@@ -185,14 +185,14 @@ class Gui():
                             drone_speed = 0.1
                         for vd in self.visual_drones.values():
                             vd.speed = drone_speed
-                    if event.key == pygame.K_n:
-                        t = False
+                    if event.key == pygame.K_n and debug:
+                        display = False
                         return_value = 'n'
-                    if event.key == pygame.K_b:
-                        t = False
+                    if event.key == pygame.K_b and debug:
+                        display = False
                         return_value = 'b'
                     if event.key == pygame.K_ESCAPE:
-                        t = False
+                        display = False
                         return_value = 'q'
                     if event.key == pygame.K_SPACE:
                         if can_do:
@@ -200,7 +200,7 @@ class Gui():
                         else:
                             can_do = True
                     if event.key == pygame.K_r and not can_do:
-                        t = False
+                        display = False
                     if event.key == pygame.K_F11:
                         pygame.display.toggle_fullscreen()
                     if event.key == pygame.K_LEFT:
